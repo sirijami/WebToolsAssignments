@@ -1,0 +1,110 @@
+Q1: If you have a websever that is run from server.js, and it serves up todo.html, which itself requests todo.js that is served up by the same webserver, what are the differences in where and how server.js and todo.js run?
+
+A1: server.js is executed on the server by some sort of Js engine (such as NodeJS).  
+todo.js is sent by the server without executing the code inside it - it is just a file.
+todo.js will execute on the client, inside the browser.  
+The two pieces of JS code are unaware of each other and each is executed in their own environments without regard to the other.
+
+Q2: Why is it valuable to run a linter against your code?   (Be specific - Make sure you tell me WHY it gives whatever benefit you list)
+
+A2:
+* The linter will ensure that the code is even runnable, before you even try to run it.  (It won't catch all errors, but it can catch completely invalid syntax)
+* You want to catch code structures that are more likely to be an error than intentional (such as redeclaring a variable in the same scope - it is more likely that you were unaware that you were doing so, and so the implications of potentially overwriting the existing value were not what you intended, even though this code will execute without complaint from the JS engine.
+* You want to encourage similar habits in code structure and layout that improve the readability/skimability/clarity of the code, even if those changes make zero difference to the actual execution of the code.  (such as various whitespace rules)
+
+Q3: Why should you wrap your code in an IIFE?
+
+A3:
+To prevent pollution of the current namespace/scope by variables from within the IIFE.  You want this because if you are sharing the namespace, you have to concern yourself with not overwriting (or being overwritten by) anything writing to that namespace.   The global browser namespace, has a long list of variables from the DOM, as well as any variables inserted by other JS scripts on the page that pollute the global namespace.  
+If you aren't sharing the namespace, then you don't have to think about, which reduces the cognitive load of working on your code, as well as removing the chance that you miss something.
+
+Q4: How is it that an IIFE works to give you the benefit from Q3?
+
+A4:
+Because variables declared with var, along with named function declarations, are defined in a function-based scope, when code is run inside a function, any declarations within it override the containing namespace rather than overwrite it, so even if you do have a variable/function that is named the same as a variable in the containing scope, your changes to your version will not alter the version in the containing scope, and any changes to the version in that containing scope will not impact your version.  An IIFE defines a function that contains your code (creating a new namespace), and then immediately executes that function (running your code within that new namespace).  
+
+Note: This only works if you DECLARE all of your variables within the IIFE.  Should you miss a declaration, the code will still execute, but using the value in the containing namespace (overwriting what was there, or being overwritten when something changes the value in the containing namespace).  Having everything in your IIFE and using a linter can help prevent such an omission.
+
+Q5: What does package.json do?
+
+A5:
+Package.json supplies basic information about the current project (the current directory), such as the project name, version, and dependences. It also can provide definitions for various helper scripts, presumably ones related to the current project.
+
+Q6: I asked you to modify the PATH variable on your system to include "./node_modules/.bin/"  (or ".\node_modules\.bin\" for Windows users).  Why?  What does that do for you?
+
+A6: What is a PATH?   When you try to run a command from the command line, the Operating System (OS) has to figure out what that command is.  A few are built in, but most are actually programs on the system.  These program files are stored in some directory.  The PATH tells the OS (technically the shell, not the OS, but we'll treat them as the same for now) which directories to check for the command in, and in what order.
+ 
+For example, my PATH starts something like: `/bin/:/usr/bin/:/usr/local/bin/`    
+You can see your PATH by typing `echo $PATH` at the command line
+
+This means that when I type `foo` at the command prompt and hit return, I'm asking the system to run the program "foo".
+
+Using the path, it will first look for foo in the first directory listed.  In this case it checks for `/bin/foo`
+If not found, this example would check `/usr/bin/foo` and then `/usr/local/bin/foo`
+If those don't exist, and I've modified the PATH as mentioned above, it will then check `./node_modules/.bin/foo`
+"." means "current directory" (and ".." means "one directory up", so when you type `cd ..` you are saying "change directory to my parent directory", and it's the same syntax as `cd /tmp/` which says to go to the tmp directory under the root, or `cd tmp` which says go to the tmp directory from where i'm at.
+`cd tmp` and `cd ./tmp` are the same thing (unlike program execution, `cd` pays no attention to PATH and assumes any directory listed is in the current directory unless the listed directory starts with `/`, in which case it considers that directory relative to the root directory (`/`).   `cd bar/../tmp` also has the same result as `cd tmp`, technically, though that's silly.   That is "change to tmp directory that is below the parent of the bar directory from where we are at - it will only work if you have both a bar and tmp directory under your current directory.
+
+Utilities that are installed locally install into a .bin directory under the node_modules directory under the directory you ran the npm command in.   By adding `./node_modules/.bin` to the end of the path, we're saying "if you are trying to run a command and can't find it elsewhere, check the .bin directory under node_modules inside whatever directory we are currently in" 
+
+Q7: JS Templates are no longer the common solution for web development, but they were the best option for a while.  What benefit did JS-based templates offer over previous options (such as the first version of our ToDo app)?
+
+A7: Templates allowed for modularity of content.  (Modularity allows for reuse, which in turn makes it easier to make a change across the application.)  Templates also moved that (HTML) content out of JS and into the HTML, which it easier to get accurate help from your tools (editors, linters, etc).
+
+Q8: Templates do not have to be placed inside a script tag.  Why is it that we often put them in one? 
+
+A8: Two main reasons:
+* When JS templates initially gained popularity, there was no easy/reliable way to have multiline strings (which HTML templates often are, because while the browser does not care if there are muliple lines, the humans reading/skimming/editing really do).  Placing the HTML template in the HTML allowed for easy multiple lines. 
+* Using a script tag specifically to wrap that content was done because a `<script>` tag with an unrecognized type is ignored by the browser, both in the HTML spec AND in the actually implemented browsers (major browsers at least), even then.  Ignoring the content means that it would cause no syntax errors, nor would anything from the script tag itself be rendered on the page.  Though we often use a fancy `text/x-handlebars-template` type on the script tag, that's for human benefit.  The browser just knows that it doesn't recognize that type.  We could use "foo" as the type in the script tag and the result would be the same.
+
+Q9: If you are in a workplace and starting a new project with some co-workers.  What should influence the rules you choose to have your linter apply to your code?
+
+* We should choose rules that catch syntax that is more likely to be a logical error (not a syntax error) that it is likely to be deliberate.  These rules should reduce the number of bugs, because logical errors are only found in testing (if they are even found then) while syntax errors are found as soon as the code attempts to execute (or is passed through a linter).  An example of this kind of rule is declarign a variable in the same scope twice.
+* We should choose rules that improve the readability/skimability/clarity of the code.  The coding patterns enforced by these rules do not usually impact the execution of the code at all, but can impact how clear parts of the code are to someone reading it, ranging from `if` blocks looking the same in all parts of the file (and in all files) to making sure that whitespace is applied consistently so that someone's brain doesn't miss a piece of code just because it didn't follow the expectations set by the rest of the code.  An example of this kind of rule is a rule stating where the `{}` of an if/else block should appear, same line/different line, or a rule ensuring that indentation is done with only tabs or only spaces, but not both.
+* We should choose rules that encourage us to avoid legal syntax that is likely to lead to a logical error in the future.  This is not currently a syntax error nor a logical one, but it's likely to lead to a logical error.  An example of this kind of rule is requiring that you never use an `if` without a block.  `if` statements without a block are legal (only the next statement will have execution impacted by the conditional), but it very easy for the next person to come along to not realize that this `if` didn't have a block when they add an indented line intended to be impacted by the conditional, but in execution it won't be.  Having a rule banning this behavior will prevent people from creating the potential for easily-made future logical errors in the first place.  
+* We should NOT choose rules that catch legit, safe, and intended code more often than they find actual problems we want to change.  Such rules will just add work and create "noise" in the code (in the form of comments that tell the linter to not yell about this particular instance).
+* We should NOT choose rules that make the code less clear, according to the subjective tastes of our group.  Many rules have opposite versions, because for every coder that likes using spaces to indent there is one that likes using tabs.  For every coder that likes grouping properties alphabetically, there is one that prefers to group properties that are related by purpose rather than the letters involved.  There are even rules to require semicolons be present and others to require they NOT be present.  We should find rules that work for our brains and with each other, and use those, and not apply rules for no reason.
+
+Q10: With JS-based templates, there are three distinct steps.  Explain what each of the steps below does in relation to using a template:
+```
+var a = document.getElementById('some-id').innerHTML;
+var b = Handlebars.compile(a);
+var c = b({ some: 'object'});
+```
+A10: 
+`var a = document.getElementById('some-id').innerHTML;`: This line finds the script tag in the document that holds the template content, and puts that content in variable a.  That content at this point is a string.
+`var b = Handlebars.compile(a);`: This line has Handlebars (loaded into a global variable when we loaded the Handlebars library script) analyze the template content and return a function that will return a string that is the result of evaluating the template using the properties of a passed object.  This function (placed in variable b) can be used multiple times, being potentially given a different object each time.  
+`var c = b({ some: 'object'});`: This line executes the function that represents the compiled template, giving it an object with properties to be matched to the parts of the template that are to be replaced.  After execution, variable c is given the resulting string (the template with text replaced and any template system commands, such as a loop, evaluated).
+
+Bonus Questions:
+
+B1: What is the difference between a global install and a local install via npm?  When would you use one or the other?
+
+BA1: A local installation means packages are installed in a node_modules/ directory relative to some project.  Normally these files will only be used by JS that is within this directory.  You should favor local installations for any libraries or utilities that are needed for a project.
+ 
+A global installation means packages are installed in a central place on your machine so you can use that code from anywhere.  For utilities this means a directory in your path (usually earlier in the PATH than the entry for local installations), while for libraries this means a central directory that node will check for packages by default.  Normally you only want to do a local installation with utilities as opposed to libraries (example:  express is a library to write web servers in node.  There is really no such thing as "running" express by itself.  You need to have code that calls and uses the library.  Eslint, on the other hand, is a utiltity - a program you can run without additional code to call it.  While you might have a reason to install a utility globally - it isn't part of any projects or is a utility you intend to use outside of projects - there is almost no reason to install a library globally.
+
+Because a global installation (using recommended PATH settings) takes precedence over a local installation, if you have a global installation you will not know if your project contains everything it needs and works correctly with only the dependencies listed in the package.json.  If a dependency isn't listed in the package.json but you have it installed globally, the project code will work for you, but not for someone else that gets your project but does not have that dependency installed globally.  If you have the dependency listed, but with the wrong version, when you run the project code you can get a different result than someone that installs only the version listed in the package.json.
+
+B2: What is the difference that makes it so that a web server can be written in multiple languages, but that JS is the only practical option for client-side web code?
+
+BA2: HTTP is a text-based protocol that does not care about what language the server or client is written in. The server side executes the server code on an ordinary operating system that can already run programs from many languages.
+
+The browsers only run JS, however, because that's the only thing the major browser vendors have all agreed to. Client side code runs inside the browser itself, so the browser has to understand how to process the code.  
+
+The server side has the operating system do the execution, which is already done for a huge variety of languages, in particular compiled languages, as different compiled languages compile to either system instructions or virtual machine byte code.  
+For server-side system instructions, regardless of source language the end result uses the same "language", so all that is required is a compiler that can convert the source code of the language into the system instructions of that operating system.  
+
+For virtual machines the process is similar - the compiler converts the source code of different languages into byte code that the virtual machine can treat like system instructions.  This does require not only a compiler to convert the source language into byte code, but also a program (written using a system instructions-type compiler) that can "execute" the bytecode.However, you get the benefit of being able to run that same resulting byte code on a variety of operating systems without a different compilation for each target environment. In fact, the compiler to convert source code into byte code can itself be written for the virtual machine, meaning that only the virtual machine executor has to be compiled using the system instructions of the various operating systems. 
+
+While some browser vendors have included the ability to run a specific language other than JS, the other vendors don't (currently, and not expected to change anytime soon) support a language promoted by a rival, and even if all the vendors did agree to support another language for the browser, it  would be just one specific language at a time, not the wide variety supported by most operating systems.
+
+As additional information there is a project, WebAssembly (wasm), building off of the earlier asm.js, that is working to essentially create a virtual machine in JS, so that you can compile other languages into WebAssembly (bytecode) and execute them on the browser which can use the virtual machine that itself is JS to understand the bytecode instructions. While this technically is still just running JS (rather, running some JS that knows how to execute some other compiled format), the source code can be an existing program in a non-JS language. Because of the way modern compilers are built, the effort involved in adding a second (or third, or so on) language is much less once the first is working, so we may soon(ish) see other languages becoming viable for web development, though I wouldn't expect JS to get dethroned too quickly.
+
+B3: If a webserver receives an HTTP request that involves the path /path/something.html, describe how a dynamic response would differ from a static one.
+
+A static response would take the path from the url (and perhaps parameters) and match this to a file on the filesystem that the server has access to.  Usually this involves considering the absolute path in the url relative to a configured directory on the server, so in our example, the server is configured to have some directory as the "root" of what it is serving, so `(that directory)/path/something.html` is the file that will be sent as a response to the request.  Static responses are unchanging - the path (and possibly parameters) decide what file to send, but that file exists as an actual file.
+
+A dynamic response creates new content and sends that as the response as opposed to an existing file.  Dynamic responses still use the path, and parameters are much more commonly considered than with static responses, but the key difference is that a static response uses a static asset - an actual file, while a dynamic response creates an asset on-the-fly.  (It's possible for a dynamic process to create an actual file that is then used for subsequent requests as a matter of efficiency, but that doesn't change the underlying meaning - that's a dynamic response ensuring that future requests will be static ones.
+
+Static responses are generally faster than dynamic ones because all that is needed is to find a file on the filesystem, where a dynamic response involves running code to create the content.

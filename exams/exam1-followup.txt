@@ -1,0 +1,121 @@
+Info 6250 - Exam 1 Follow up
+
+VVVVVVVVVVVVVVVVVVVVVVVVVVVVVV
+DUE BY MIDNIGHT FRIDAY JULY 21 
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Q1: Given the HTML below that is loaded from http://animals.example.com/cats/heroes.html
+
+<b>Known Cat Heroes</b>
+<ul>
+  <li>Lil' Bub</li>
+  <li>Maru</li>
+  <li>Grumpy Cat</li>
+</ul>
+
+Add the HTML necessary to load the following:
+* the CSS file 'site-styles.css' from the root directory, using an absolute path, BEFORE any other CSS
+* the CSS file 'styles.css' from the current directory, using a relative path, BEFORE any HTML
+* the image file 'hipster-cat.png' from the current directory using an ABSOLUTE path
+* the library 'awesome.js' found in /libs/js/ on http://radical.example.com, to run BEFORE any other JS on the page, but AFTER any CSS
+* the file 'site.js' from the root directory using a RELATIVE path, AFTER any CSS, and after any HTML
+* the file 'page.js' from the current directory using an ABSOLUTE, FULLY QUALIFIED path, as the last JS loaded
+
+<link rel="stylesheet" href=“http://animals.example.com/site-styles.css“ ></link>
+<link rel="stylesheet" href=“cats/styles.css“ ></link>
+<b>Known Cat Heroes</b>
+<ul>
+  <li>Lil' Bub</li>
+  <li>Maru</li>
+  <li>Grumpy Cat</li>
+</ul>
+<img src=“http://animals.example.com/cats/hipster-cat.png"></img>
+<script type="text/javascript" src=“http://radical.example.com/libs/js/awesome.js” ></script>
+<script type="text/javascript" src=“../site.js” ></script>
+<script type="text/javascript" src=“http://animals.example.com/cats/page.js” ></script>
+
+Q2: You and a teammate are working on a dynamically-generated website.  (pages are generated server-side on a per-request basis).
+The site works by having a user id in the url of every request coming in, and including that in any links to the site from within the site.
+(e.g. http://dynamic.example.com/page1.html?userId=654321
+This id is tied to a database of information about each user, so on each request the server can consult that information while dynamically assembling the page for the user.
+
+As part of your site the user can pick a music artist, then go through several pages about the musician's songs and albums.  They can do so for a different artist the next time they visit the page.
+
+The list of songs/albums for each artist is slow to load, so rather than loading it for every page, your teammate wants to stick it in the database under each userId as 'current musician', so that each request, instead of having to request the data again, can just use that data.  It even means that you wouldn't have to pass any identifier about the selected musician to subsequent pages!  (e.g. you could say http://dynamic.example.com/favorite-albums.html?userId=654321 instead of http://dynamic.example.com/favorite-albums.html?userId=654321&artist=2345 )
+
+Your teammate has forgotten a fundamental concept of the web.  What is it, and how could your teammate's plan go awry as a result?
+
+A2. The teammate suggested saving the artist id along with user id, but the page load was slow because the website was trying to load list of songs. We need to find a way to cache songs and albums for frequently visited artist.
+
+Q3: What does the command 'npm install' (with no other parameters) do?  When would you want to do that?
+It installs all the dependencies listed in package.json file.
+
+When you want to make sure all the dependencies are installed correctly in your current project/work area folder.
+
+
+Q4,Q5: Consider the code below, then answer the questions at the end:
+```
+const wordMagic = {
+  word: '',
+  anagrams: [],
+  setWord: function( word ) {
+    this.word = word;
+    this.anagrams = this.makeAnagrams(word);
+  }, 
+  makeAnagrams: function(word) {
+    // Imagine this populates this.anagrams
+    // with all the ways to rearrange the letters of word    
+  },
+  isAnAnagram: function(word) {
+    let found = false;
+    this.anagrams.forEach( (anagram) => {
+      if(anagram === this.word) {
+        found = true;
+      }
+    });
+    return found;
+  }
+};
+
+// Example usage:
+wordMagic.setWord('apple');
+if(wordMagic.isAnAnagram('elppa')) {
+  return 'yes, that was an anagram of apple';
+} else {
+  return 'no, that was not an anagram of apple';
+}
+```
+Q4: The code does not work as desired.  When you call wordMagic.isAnAnagram(), it reports "cannot get property 'word' of undefined'".  Why?  Show me _TWO_ changes that could each fix it.
+
+const wordMagic = {
+  word: '',
+  anagrams: [],
+  setWord: function( word ) {
+    this.word = word;
+    this.anagrams = this.makeAnagrams(word);
+  }, 
+  makeAnagrams: function(word) {
+    // Imagine this populates this.anagrams
+    // with all the ways to rearrange the letters of word    
+  },
+  isAnAnagram: function(word) {
+    let found = false;
+    this.anagrams.forEach( (anagram) => {
+      if(anagram === word) {                 //Only error i found was here
+        found = true;
+      }
+    });
+    return found;
+  }
+};
+
+When its “this.word” it checks for the wordMagic property ‘word’ instead of checking the parameter passed.
+
+I certainly don’t see the error “"cannot get property 'word' of undefined”. But my guess is it usually shows this error when it loses the context of ‘this’.
+
+
+Q5: isAnAnagram() turns out to be inefficient when you're dealing with very large words/sentences.  What is an easy way to make it more efficient? 
+A5: The efficient way to deal when it comes to so many letters is to create a hash map for input word and the parameter word. Take the input word and set the keys as characters and count as their value. Do the same with the parameter word which is passed. Then loop through and check each letter and their counts.
+
+B1-B3: (hard!) Without changing the rest of wordMagic, and without using outside libraries, write makeAnagrams() so that it works.   (Partial answers accepted)
+

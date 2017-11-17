@@ -1,0 +1,58 @@
+Q1: Does JS use Prototypal inheritance or Classical inheritance?
+JS uses Prototypal inheritance.
+ 
+Q2: What is the difference between Prototypal inheritance and Classical inheritance?
+Prototypal inheritance you can inherit properties from any object whereas in Classical inheritance the objects(child) inherits properties from it’s parent.
+ 
+Q3: When are you likely to "lose" the context (`this`) for a function?
+When the scope of ‘this’ is global.
+ 
+Q4: What is the difference between a "class" and an "object"?
+Class is the blueprint for an object.
+Object is an instance with a state and behavior.
+ 
+Q5: What is an "instance"?
+Instance is the state of object with associated behavior.
+ 
+Q6: What is "duck typing"?
+ 
+Q7: List (by name or description) 3 ways of creating a JS object that will inherit
+Using class constructor function.
+Using brute force method
+Using Object.create()
+ 
+Q8: Create a class called First that uses one of those ways to inherit
+function First()
+{
+}
+var foo = Object.create(First);
+It creates a object foo similar to first.
+ 
+Q9: Create a class called Second that uses a different way to allow inheritance
+function Second(){
+this.name = name;
+}
+
+Second.prototype.doStuff = function(){
+console.log(“Second”);
+}
+var sec = new Second();
+ 
+Q10: What does the bind() method return?
+Bind is a function which returns a method.
+When a bind() is called it’s means explicit binding with respect to ‘this’ context.
+ 
+B1: What is the modern advice regarding class inheritance?
+Not to use class in javascript.
+It may cause problem using callBacks.
+
+ 
+B2: What does "ES" stand for when we say ES3, or ES5, or ES6?
+ECMA Script
+ 
+B3: How is a prototype different from a parent class?
+
+‘Prototype’ adds properties or method to the existing prototype. Whereas parent class is the constructor function with the properties.
+
+Every object has a “prototype” in it’s properties.prototype is itself a object.
+

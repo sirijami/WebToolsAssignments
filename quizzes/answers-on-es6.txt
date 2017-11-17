@@ -1,0 +1,141 @@
+Q1: In practical terms, what are the differences between let, const, and var, and when should you use each?
+
+A1:
+`var` declares variables that are function-scoped.  It was the only option before ES6, and should be used if your code is pre-ES6, and not be used when your code is ES6+.
+`let` is similar to var, but the variables it declares are block-scoped.  It should be used when your code is ES6+ and the variable name will be reassigned a new value, so it can signal to a reader that the variable is changed somewhere in the block.
+`const` is also block-scoped, but any variables declared by `const` are not permitted to have their value change.   (Arrays and Objects can have properties change, but not the base object).  `const` should be the preferred variable declaration in ES6+, as the variable reassignment that requires `let` is far less common than cases that const can work on.  This preference is so the `const` can be a signal to someone skimming/reading the code that the value they see is the value they will get at the the end of the block (subject to any property changes).
+
+Q2: I recommended that you use argument destructuring in your function declarations when you have more than 2 arguments (fewer is fine).  Why?  
+
+A2:
+When you have more than two parameters to a function, it becomes difficult to know what the params are used for when looking at the code calling the function, and when calling the function, it can be difficult to remember the order of the parameters.
+Example:   convertToMoreAwesome( 'I like clouds', true, 4, false);
+Using destructuring allow the function to be called with the keys serving to describe what the value means.  It also means that the order of the arguments no longer matters.
+Example:   convertToMoreAwesome({ target: 'I like clouds', mixedCase: true, maxLen: 4, useColors: false });
+
+Q3: Rewrite this function using at least 2 ES6+ items: 
+
+var improve = function( word, hate, love ) {
+  return word.replace(hate, love);
+};
+
+A3:
+const improve = ({ word, hate, love }) => word.replace(hate, love);
+
+Q4: For some time, your team has a function they use on strings a lot.
+Good News!  The latest spec includes this function as a method on all strings.  Yay!
+Bad News!  Not all the browsers have updated.  Boo!
+
+Your team does not use a transpiler, so that's not an option.
+
+Your desire is to have:
+
+// "story" is defined elsewhere as a string 
+
+story = story.improve();  // this should work for ANY String
+
+Work as intended, given the original function below:
+
+function improve( text ) {
+  return text.replace(/dog/g, "cat");
+}
+
+Write a polyfill to make it so that the improve() method is available on Strings if the browser hasn't added it, but leave the browser's implementation alone if it exists;
+
+A4:
+if( !String.prototype.improve ) {
+  String.prototype.improve = (text) => text.replace(/dog/g, "cat");
+}
+
+Q5: Describe when you should do a global npm install and when you should use a local npm install (Hint: "When you want it local" doesn't count.   WHY do you want it local vs global?)
+
+A5:
+A global install should be used only for utilities that are not bound to a particular project.
+A local install should be the default case, but generally you want a local install for any libraries and utilities associated with a project, so that you are using that specific version and installation from that project as opposed to your global installation that may not match the listing in the project.
+
+Q6: Here is a concept for a function...make it work as intended without using the variable "arguments":
+
+function( ??? ) { // we need it to take any number of numbers, but not an array :(
+  let total = 0;
+  ???.forEach???( function (item) {  // we want to treat the "any number of params" as an array, I guess
+    total = total + item;
+  });
+  return total;
+}
+
+A6: 
+
+The rest operator in a function declaration tells it to take any params (in order) that were not assigned to other params and create an array of them:
+
+function sumUp ( ...args ) {
+  let total = 0;
+  args.forEach( (item) => {
+    total = total + item;
+  });
+  return total;
+}
+
+This can be called as sumUp(1,2) or sumUp(3,4,5,6,7,8,9) or any other number of params;
+
+Q7: Now for the opposite case:  You have two functions:
+
+takesParams() and givesArray()
+
+You want to take the array from givesArray and pass it to takesParams   
+BUT - takesParams doesn't expect an array, and you can't modify either of theses functions.
+
+if you can't say takesParams( givesArray() ) because takesParams() can't handle an array, show me what you CAN do.
+
+A7:
+
+The spread operator is sort of the opposite to rest: it takes an array and converts it to all the individual elements (used where a comma-separated list of arguments are expected).
+
+takesParams(...givesArray());
+
+So if givesArray() returned [3,4,5], this is the same as saying takesParams(3,4,5), not takesParams( [3,4,5] );
+
+Q8: ES6 and ES7 have strict, technical definitions, yet webdevs tend to lump them all together into ES6+.  Why do we do that?
+
+A8: While the standards are strictly defined, the implementations in the browsers of the various features are not so distinct, so you may well have some ES6 and some ES7 features you can use, while there are other ES6 features that you cannot use within your supported browsers.  Also, because the tooling (transpilers, etc) to develop ES6 that will run on all major browsers is the same tooling for later features, there is really no reason not to adopt ES7 features as soon as they are available in your toolset, meaning that a dev will rarely specifically target ES6 only, but rather "below-ES6" and "ES6-and-up".
+
+Q9: Convert this to use template literal(s):
+
+nunction pluralize(word, number) {
+  u have ${number} ${word}`;
+  if( number === 1) {
+    return "You have " + number + " " + word;
+  }
+  if( word === "kitty") {
+    word = "kitten";
+  }
+  return "You have " + number + " " + word + "s";
+}
+
+A9: 
+
+function pluralize(word, number) {
+  if( number === 1) {
+    return `You have ${number} ${word}`;
+  }
+  if( word === "kitty") {
+    word = "kitten";
+  }
+  return `You have ${number} ${word}s`;
+}
+
+Q10:  Take the above function, and write it as a fat arrow function with a default number of 1.  Make sure I can call:
+
+pluralize("kitty");  // This needs to work exactly as is when you are done. 
+
+
+A10:  
+const pluralize = (word, number=1) => {
+  if( number === 1) {
+    return `You have ${number} ${word}`;
+  }
+  if( word === "kitty") {
+    word = "kitten";
+  }
+  return `You have ${number} ${word}s`;
+};
+

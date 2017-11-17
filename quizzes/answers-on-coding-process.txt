@@ -1,0 +1,63 @@
+Q1: If a promise triggers a catch() callback, and that callback does not throw an error and does not return a rejected Promise, the catch() is treated as returning a resolved Promise.
+Assuming the function returnsAPromise() will either return a promise that resolves with a number, or that rejects with a string, write good code that will use this feature to:
+* console.log() any string from the promise
+* treat any such error as if it had been resolved with the number 500
+* calls handleResult(), passing it the appropriate number
+* only have a call to handleResult() appear in your code once.
+
+A1:
+
+returnsAPromise()
+.catch( (error) => {
+  console.log(error);
+  return 500;
+})
+.then( (number) => {
+  handleResult(number);
+});
+
+
+Q2: I make a webservice call, but my page doesn't change at all.  
+Assuming the webservice itself works and that my code is free of syntax errors, list at least 2 different things I can check/do to understand what is happening.  (Be detailed!)
+
+A2:
+
+* Check the browser console for error messages
+* Look at the Network tab to ensure the network call is made
+* Look at the Network tab, Headers in the dev tools and see what data I am sending to see if it formatted correctly
+* Look at the Network tab, Preview in the dev tools to see what data is coming back to see if it matches my expectations
+
+Q3: Consider this code then answer the questions at the end: 
+```
+let masterNumbers = [4, 8, 15, 16, 23, 42];
+
+function doMaths() {
+  let total = 0;
+  masterNumbers.forEach( (number) => { 
+    total = total + number; // what if masterNumbers gets updated while this is running?
+  });
+}
+
+fetch('http://numbers.example.com/')
+.then( (response) => {
+  if( !response.ok ) {
+    throw new Error('uh-oh');
+  }
+  return response.json();
+})
+.then( (numbers) => {
+  masterNumbers = [...numbers, ...masterNumbers];  // Puts numbers at start of array
+});
+
+setTimeout( () => {
+  doMaths(numbers);
+}, 1000);
+```
+I'm worried that the service call may change the data mid-operation, as noted in the comment.  
+Am I right to be worried?  If yes, how can I prevent any problem?  If no, why not?
+
+A3: 
+
+There is nothing to be worried about.  JS will not execute asynchronous code handlers (such as resolving the callbacks in the fetch() promise chain or the setTimeout callback) while another code block is running.  So no other JS code of yours will execute while doMaths() runs, nor will other JS code (such as doMaths()) run while any of the then() callbacks are running.
+
+

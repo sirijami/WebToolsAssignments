@@ -1,0 +1,17 @@
+To prepare:
+
+* Know how to create an object with inheritance (i.e. a "class")
+* Be able to read, at least ES6 syntax, including arrow functions, destructuring
+* Understand what a promise is, what it means to resolve or reject.
+* Be able to create a Promise without using fetch
+* know when to use an object and when to use an array
+* know how to find the answers to JS syntax questions on web
+* understand absolute and relative links and how to use them
+* know how to request a url using fetch(), including using different HTTP methods (verbs)
+* know how to receive data from fetch, be it JSON or not JSON
+* know how to manage the reponse from fetch, checking for success and error type
+* know about Same Origin Policy
+* know where JS runs, server vs client
+* understand how a polyfill works and how to write one.
+
+

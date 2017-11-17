@@ -1,0 +1,82 @@
+Q1: Why do you want to have separate JS, CSS, and HTML files?
+To make the code maintainable and readable.
+Any changes on file should not effect the other to break.(Maintaining less dependencies)
+
+
+
+Q2: Why do you NOT want to use alert() outside of class demos?  
+    (including not wanting to use it while debugging)
+A: alert interrupts the user to perform any action until and unless responded to it.
+
+Q3: What is event bubbling?
+A:Event bubbling is means the events starts from origin and moves to wrapped elements to find any handlers/listeners.
+By default event bubbling takes place.
+
+
+Q4: What is the difference between class and id in HTML?
+They both are selectors. 
+id are unique whereas class are not.
+id’s are used if there functionality are not reusable anywhere in the code.
+whereas to reuse same functionality on different element just use the same class name on the element.
+if a element has both id and class then Id have more priority than classes.
+classes are represented as . id’s are #
+
+Q5: Which will you do more of, reading code or skimming code?
+skimmimg code
+
+Q6: Which will you do more of, writing code or debugging code?
+debugging
+
+Q7: Why do we use addEventListener() in JS instead of onEvent="" in HTML?
+It not a good idea to mess js and html in same file.
+Secondly, by using addEventListener() we can perform different tasks on the same event.
+
+Q8: Why should you not use the DOM as the source of truth for data storage?
+Other scripts can modify the code.
+While debugging it is difficult to look for DOMobjects.
+while testing it’s difficult to understand the logics.
+While performing more number of operation on same event it will be difficult to scrape data from DOM and work. 
+
+Q9: (2 points)
+
+    Write the best JS to make clicking this button add the next number to the list
+    WITHOUT reading from the DOM
+    Assume the JS is being loaded onto the page already.
+    You are welcome to use the Web, but be aware of time limits!
+
+    <ul id="list">
+       <li>1</li>
+    </ul>
+    <button id="add">What is next?</button>
+
+var inputValue = document.querySelector(‘li’);
+var itemList = document.getElementById('list');
+ var items = [];
+
+ add.addEventListener('click', function(){
+   var item = inputValue.value + 1;
+   items.push(item);
+   renderList(itemList, items);
+ });
+
+ function renderList(listElement, items){
+   listElement.innerHTML = ' ';
+   items.forEach(function(item){
+     var li = document.createElement('li');
+     li.textContent = item;
+     listElement.appendChild(li);
+   });
+
+
+B1: Why do we have the <link> tag at the top of the HTML, and the <script> tag at the bottom?
+Once the browsers renders the HTML page, all the style sheets should be loaded to arrange the html elements in place. Else the page will be rendered with no layout,color etc which will be messy to look and understand.It causes bad user experience. Hence they are loaded before the html elements are loaded.
+
+If the script tag is added on top then the browser has to wait until it download and executes the javascript file. It cause poor performance. Hence it is added below.
+
+B2: Why do we try to add/remove CSS classes rather than modifying the styles on an element?
+adding/Removing that particular css class should not effect others.
+
+B3: What is a good reason to use event bubbling?
+It can look further up to the root node to look for any handlers/listeners to execute.
+Once it’s gets it can trigger the event.
+

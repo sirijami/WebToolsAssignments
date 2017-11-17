@@ -1,0 +1,134 @@
+Q1: In practical terms, what are the differences between let, const, and var, and when should you use each?
+let is block based whereas var is function based.
+Block based means they cannot be accessed out of the {} whereas functions can.
+when you want to access the value just within the block then use let and to access outside  the function then use var.
+const is used when the value of variable is not changed further/later.
+
+
+Q2: I recommended that you use argument destructuring in your function declarations when you have more than 2 arguments (fewer is fine).  Why? 
+It is easy to access the value/information using argument destructuring.
+Use can set default values for the keys.
+you can access needed information using rest and spread operator
+ 
+
+Q3: Rewrite this function using at least 2 ES6+ items: 
+
+var improve = function( word, hate, love ) {
+  return word.replace(hate, love);
+};
+
+let improve = (word, hate, love) => {
+    return word.replace(hate, love);
+};
+
+Q4: For some time, your team has a function they use on strings a lot.
+Good News!  The latest spec includes this function as a method on all strings.  Yay!
+Bad News!  Not all the browsers have updated.  Boo!
+
+Your team does not use a transpiler, so that's not an option.
+
+Your desire is to have:
+
+// "story" is defined elsewhere as a string 
+
+story = story.improve();  // this should work for ANY String
+
+Work as intended, given the original function below:
+
+function improve( text ) {
+  return text.replace(/dog/g, "cat");
+}
+
+Write a polyfill to make it so that the improve() method is available on Strings if the browser hasn't added it, but leave the browser's implementation alone if it exists;
+if(!string.prototype.improve){
+
+     string.prototype.improve = function() {
+     return text.replace(/dog/g, "cat");
+     }
+} 
+
+
+Q5: Describe when you should do a global npm install and when you should use a local npm install (Hint: "When you want it local" doesn't count.   WHY do you want it local vs global?)
+global means packages are installed in the machine and can be accessed from anywhere.
+Locally npm install when all the dependencies and libraries are needed only for a particular project or folder.
+Whereas if libraries and modules are needed to be accessed anywhere then install globally.
+Locally installing npm  can help in customizing the dependencies.for example if you need express only for a particular project then just install that local to the folder.
+Normally local installation is done for utilities and for libraries are done globally.
+
+Q6: Here is a concept for a function...make it work as intended without using the variable "arguments":
+
+function( ??? ) { // we need it to take any number of numbers, but not an array :(
+  let total = 0;
+  ???.forEach???( function (item) {  // we want to treat the "any number of params" as an array, I guess
+    total = total + item;
+  });
+  return total;
+}
+
+
+let x = function(elem) { // we need it to take any number of numbers, but not an array :(
+  let total = 0;
+  elem.forEach( function (item) {  // we want to treat the "any number of params" as an array, I guess
+    total = total + item;
+  });
+  return total;
+}
+console.log(x(2,3,4));
+
+
+Q7: Now for the opposite case:  You have two functions:
+
+takesParams() and givesArray()
+
+You want to take the array from givesArray and pass it to takesParams   
+BUT - takesParams doesn't expect an array, and you can't modify either of theses functions.
+
+let array = givesArray([])
+
+if you can't say takesParams( givesArray() ) because takesParams() can't handle an array, show me what you CAN do.
+
+Q8: ES6 and ES7 have strict, technical definitions, yet webdevs tend to lump them all together into ES6+.  Why do we do that?
+All es6 features are not yet supported by all browsers and es7 features have also been introduced. This is the reason why all are dumped in es6+.
+
+Q9: Convert this to use template literal(s):
+
+function pluralize(word, number) {
+  if( number === 1) {
+    return "You have " + number + " " + word;
+  }
+  if( word === "kitty") {
+    word = "kitten";
+  }
+  return "You have " + number + " " + word + "s";
+}
+
+function pluralize(word, number) {
+  if( number === 1) {
+    let number = 1;
+    return `You have  + ${number} +   word`;
+  }
+  if( word === "kitty") {
+    word = "kitten";
+  }
+  return `You have  + ${number} +    word  + s`;
+}
+
+
+
+
+Q10:  Take the above function, and write it as a fat arrow function with a default number of 1.  Make sure I can call:
+
+pluralize("kitty");  // This needs to work exactly as is when you are done. 
+
+
+let pluralize = (word, number = “1”) => {
+  if( number === 1) {
+    return "You have " + number + " " + word;
+  }
+  if( word === "kitty") {
+    word = "kitten";
+  }
+  return "You have " + number + " " + word + "s";
+}
+
+console.log(pluralize("kitty”));

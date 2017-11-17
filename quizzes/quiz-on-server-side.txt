@@ -1,0 +1,71 @@
+Q1: If you have a websever that is run from server.js, and it serves up todo.html, which itself requests todo.js that is served up by the same webserver, what are the differences in where and how server.js and todo.js run?
+server.js runs server side whereas todo.js runs on client side.
+Server.js grabs the static file which is present and runs and looks for the todo.html file which intern has to access the js file dynamically by running the code.
+
+
+Q2: Why is it valuable to run a linter against your code?   (Be specific - Make sure you tell me WHY it gives whatever benefit you list)
+To find errors.
+It checks for any unused variables or undefined variables which helps to find errors easily.
+It also helps to maintain same coding convention(spaces, single or double quotes etc) throughout the project. 
+It helps mostly for team projects to follow some standards. 
+
+Q3: Why should you wrap your code in an IIFE?
+when you want to return the value from the function you wrap the function with()
+ex:(function xyz(){
+//code
+})();
+
+Q4: How is it that an IIFE works to give you the benefit from Q3?
+The benefit of IIFE is No need to give name to function and just call it using () as soon as you declare.
+IIFE are also called anonymous function as there is no name associated to it.
+
+Q5: What does package.json do?
+It downloads all the dependencies packages.
+It is a file which has all details regarding that particular package and dependencies.
+
+
+Q6: I asked you to modify the PATH variable on your system to include "./node_modules/.bin/"  (or ".\node_modules\.bin\" for Windows users).  Why?  What does that do for you?
+To download the code in node_modules. It helps the package.json to know that it’s the current project we are working on.
+
+Q7: JS Templates are no longer the common solution for web development, but they were the best option for a while.  What benefit did JS-based templates offer over previous options (such as the first version of our ToDo app)?
+You can use a snippets of html to inject different values to it. This snippet of html acts as a Template. Using the same template we can run multiple times.
+The best part of it is we don’t have to access element from DOM and change it many times.
+Mostly changes in template does leads to code breaks. As the inter dependencies are less.
+In the todo app i used Li elements template so that every time it gets a new list element it can add to page.
+
+Q8: Templates do not have to be placed inside a script tag.  Why is it that we often put them in one? 
+Since we are changing values by calling them in javascript files. It better to add a script tag to make it readable and maintainable. 
+
+Q9: If you are in a workplace and starting a new project with some co-workers.  What should influence the rules you choose to have your linter apply to your code?
+The rules should be common for all the teams.
+whether it be spaces or tabs, single or double quotes, its browser or some other environment , javascript or son file.
+They have to decide and come to a common ground which is the best suitable style fir their project.
+
+
+Q10: With JS-based templates, there are three distinct steps.  Explain what each of the steps below does in relation to using a template:
+```
+var a = document.getElementById('some-id').innerHTML;
+var b = Handlebars.compile(a);
+var c = b({ some: 'object'});
+
+```
+a = It gets the whole template text. Start from script tag to end.
+b = It compile the template and returns a function.
+c = The function is passed with the parameter and in this case it’s objects.
+
+
+Bonus Questions:
+
+B1: What is the difference between a global install and a local install via npm?  When would you use one or the other?
+It install’s globally. Install globally when you want to access from wherever you want. 
+locally install’s local to your project.
+ when you want it for particular project/folder.
+
+B2: What is the difference that makes it so that a web server can be written in multiple languages, but that JS is the only practical option for client-side web code?
+Whatever may be the language it searches different program or library to run and sends the response.
+
+B3: If a webserver receives an HTTP request that involves the path /path/something.html, describe how a dynamic response would differ from a static one.
+If it is static it retrieves that file from the folder and send the HTTP response to the client.
+It is not a static one it runs some programm or search for library and finds it and send it as a Http response.
+
+

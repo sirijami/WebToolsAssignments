@@ -1,0 +1,102 @@
+Q1: Does JS use Prototypal inheritance or Classical inheritance?
+
+Prototypal inheritance
+ 
+Q2: What is the difference between Prototypal inheritance and Classical inheritance?
+ 
+In prototypal inheritance, each object has a "prototype" object.  The prototype is an actual object. Any use of a property or method the inheriting object does not have will use the version form the prototype, including any inheritance IT has from it's prototype, and so forth. 
+
+In classical inheritance, objects are instances of classes, and the classes are intended to primarily serve as a blueprint for created instances, providing the default behavior.  In classical inheritance, an instance is an instance of the class, and usually cannot modify or extend its behavior.
+
+Q3: When are you likely to "lose" the context (`this`) for a function?
+ 
+You are likely to lose the context when you pass a function as a callback.
+
+If someObj.someFunc is a function that uses this.something inside it:
+
+var someObj = {
+  val: 9,
+  someFunc: function() {
+    console.log(this.val);
+  }
+}
+
+And you supply someObj.someFunc as a callback to another function:
+
+function iUseACallback( passedFunction ) {
+  passedFunction(); // notice no ".", so implicit binding is to the global scope
+}
+
+when THAT function executes someFunc, it will have nothing before the dot, so the implicit binding is not useful.
+
+someObj.someFunc(); // outputs 9
+iUseACallBack(someObj.someFunc);  // outputs the global "val", which is probably undefined
+
+Q4: What is the difference between a "class" and an "object"?
+ 
+A class is a blueprint for an object.  Depending on the language it may or may not be an object itself, but as a class the intention is to describe instances and provide initial capabilities.
+
+An object is a usable collection of data.
+
+Q5: What is an "instance"?
+
+An instance is the realization of a class into an object.  For example, in:
+
+var newObj = new SomeClass();
+
+SomeClass is class, and newObj is an instance.  While there is only one SomeClass class, there can be multiple instances of SomeClass.
+ 
+Q6: What is "duck typing"?
+
+Duck typing refers to not actually caring what type (aka class) an object is, but whether it has the necessary methods and properties. That is, you don't care if it IS a duck, so long as it walks like one and sounds like one.
+
+Most dynamically-typed languages (Javascript, Ruby, Python, Perl, etc) use duck-typing as a philosophy, while most statically-typed languages (e.g. Java) focus on specific types (class inheritance and/or interface declarations) to decide what an object can or cannot do.  
+ 
+Q7: List (by name or description) 3 ways of creating a JS object that will inherit
+
+Constructor function, which is instantiated using "var instance = new ClassConstructor();"  The intance will have the same prototype as the constructor function.
+
+Brute forcing the prototype, where you manually set or add to the prototype of an object.  (Rarely used)
+
+Object.create() - Calling this function and passing it an object will give you a new object that has the passed object as it's prototype.  Note that while a constructor function runs when the instance is created, Object.create() sets the prototype but does not execute any code from the prototype object.  
+
+Q8: Create a class called First that uses one of those ways to inherit
+
+function First() {
+  this.val = 7;
+}
+First.prototype.inheritedFunction = function() {
+  console.log(this.val);
+}
+
+var instance = new First();  
+ 
+Q9: Create a class called Second that uses a different way to allow inheritance
+
+var Second = {
+  val: 5,
+  inheritedFunction: function() {
+    console.log(this.val);
+  }
+};
+var instance = Object.create(Second);
+ 
+Q10: What does the bind() method return?
+ 
+The bind method is a method on all functions that returns the passed function, except that the resulting function is explicitly bound to the passed context.  Binding to the current 'this' before passing the function as a callback is the most common usage, but technically any object can be bound as the context.
+
+B1: What is the modern advice regarding class inheritance?
+
+Inheritance should not be overused, instead "composition" is the more common method of providing shared functionality. Deeply nested "trees" of objects inheriting (D inherits from C which inherits from B which inherits from A) is rarely a good idea. Shallow use of inheritance is often appropriate, however.
+
+
+B2: What does "ES" stand for when we say ES3, or ES5, or ES6?
+
+ECMAScript, named for ECMA which is the group that maintains the javascript standard.
+
+B3: How is a prototype different from a parent class?
+
+When you instantiate a class via constructor function, the instance shares the same prototype as the parent class.  In this case, the parent class is there to provide a constructor function, and is otherwise not used (the prototype of the class is used).
+
+When you instantiate a class via Object.create(), the passed object (which might be a "class" or an object depending on the purpose - is it used by itself or intended to only be used when inherited from?) becomes the prototype for the newly created instance.
+

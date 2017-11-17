@@ -1,0 +1,53 @@
+Q1: In practical terms, what is a promise?
+
+Q2: In the below code, in what order will things print, assuming functions are accurately named?
+
+console.log(1);
+returnsAPromiseThatResolvesAfterALongWhile()
+.then( () => console.log(2) )
+.then( () => returnsAPromiseThatResolvesImmediately() )
+.catch( () => console.log(3) )
+.then( () => console.log(4) )
+.then( () => { throw new Error('oops') } )
+.then( () => console.log(5) )
+.catch( () => { return "okay"; } )
+.then( () => console.log(6) );
+console.log(7);
+
+Q3: What does "resolve" mean versus "reject" in terms of a Promise?  What happens as a result?
+
+Q4: When using fetch(), what is different when sending a GET request vs a POST request?
+
+Q5: If I have a function doStuff() that ends in: return Promise.resolve( someValue ); 
+How would I be able to get someValue from outside the function?
+
+Q6: What can you tell me about the return value of the then() method of a promise?
+
+Q7: Why does the following code not work as intended?
+
+try {
+  returnsAPromise()
+  .then( (value) => { console.log( value.paws ); } )
+} catch (err) {
+  console.log('looks like that was not an object, it threw an error');
+}
+
+Q8: When using fetch, we often follow it with two then()s, like this:
+
+fetch(someUrl)
+.then( (response) => response.json() )
+.then( (json) => doStuff(json) )
+.catch( (err) => console.log(err) );
+
+What does the first then() do compared to the second?  Why do we have two?
+
+Q9: When do you know that you the then/catch callbacks will NOT run until later?
+
+Q10: What other concept is an alternative to using promises?
+
+B1: What is a benefit of promises over the alternative you listed in #10?
+
+B2: Why do we use fetch() instead of XHR?
+
+B3: When we call code "async", what does that mean in practical terms?
+

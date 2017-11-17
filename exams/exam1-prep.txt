@@ -1,0 +1,20 @@
+comparison
+data types and values (primitives and objects) and coercion 
+DOM (in general)
+ES6 and polyfills
+Event listeners
+Event Propagation
+HTML forms  (Note: "WebForms" is some ancient Microsoft junk)
+HTTP (high level) & statelessness
+linter rules
+npm installations
+prototypes
+Scope and closures
+this: when you lose it, how to keep it.   ( 3 ways! )
+URLs
+
+NOT ON EXAM 1:
+
+Promises and async
+service calls and fetch
+

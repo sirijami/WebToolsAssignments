@@ -1,0 +1,247 @@
+Q1: In practical terms, what is a promise?
+
+A1:
+Very short form: A promise is an object that tracks a completion state and can call an appropriate callback after completion.
+
+Short form: A promise is an object that tracks its own initial state(pending) towards a final success(resolve) or fail(reject) state, and will call an appropriate success/failure callback once at some point after the promise reaches a final state, even if the callback is assigned after the promise has reached a final state.  When given a callback, the promise returns a new promise that will resolve or reject after this promise does.  This combination allows us to chain asynchronous tasks to apply an order to them when needed.
+
+Kinda over-the-top technical form:
+
+A JS promise is an object that:
+* Tracks its state as pending, resolved, or rejected (the latter two have a value(s) associated with it)
+* Can be given a callback to call after it resolves (even if it already is)
+* Can be given a callback to call after it rejects (even if it already is)
+* When given a callback will return a new promise that will only resolve or reject after this promise
+* A returned promise that resolves will resolve with the return value of the callback given to the promise that created this one
+* A returned promise that rejects will reject with the error or reject value of the callback given to the promise that created this one
+* A returned promise will resolve/reject to match the state of any promise that this promise was resolved/rejected with if this promise did not have the appropriate success/failure callback
+
+Way too much information about convenience methods:
+* There exists a method ( Promise.all() ) that returns a promise that will resolve with the resolve values of an array of promises, once all the promises resolve, or with the reject value of the first promise in that array to reject
+* There exists a method ( Promise.race() ) that returns a promise that will resolve or reject with the corresponding resolve/reject value of the first promise out of array of promises to resolve or reject.  The remaining promises will not impact this race promise after the first one completes.
+
+Q2: In the below code, in what order will things print, assuming functions are accurately named?
+
+console.log(1);
+returnsAPromiseThatResolvesAfterALongWhile()
+.then( () => console.log(2) )
+.then( () => returnsAPromiseThatResolvesImmediately() )
+.catch( () => console.log(3) )
+.then( () => console.log(4) )
+.then( () => { throw new Error('oops') } )
+.then( () => console.log(5) )
+.catch( () => { return "okay"; } )
+.then( () => console.log(6) );
+console.log(7);
+
+A2:
+
+The resolution order of promises can be very daunting at first, but with practice it becomes second nature.
+
+The output order is 1 7 2 4 6.  The 3 and the 5 are never output, neither is 'oops', nor 'okay'.
+
+Here's why:
+
+1 emits first because it is before any step.  
+
+7 emits second, because all other outputs are in callbacks that are not called while immediate user code is running - they will only run once promises resolve or reject, and that will not occur until this initial code is done.  We have 1 and 7 so far.
+
+Each then() and catch() returns a new promise, and those promises will not resolve/reject until the promise the then() or catch() was called on resolves...meaning that until returnsAPromiseThatResolvesAfterALongWhile() is fulfilled, no other callback will execute (and thus no other numbers will output).
+
+So after 7, the next callback to run is the one passed to the first then(), aka 2, so so far we have 1, 7, and 2
+
+When that callback resolves, its return value (undefined) is the value that the promise the then() returned resolves with. The next then() callback is called (it is passed undefined, but it wasn't looking for any parameters), and it calls (and returns the result of) returnsAPromiseThatResolvesImmediately(). The resolve value of the promise that the long-named function returns is what the promise of the then() callback calling it resolves with (all undefined), and most importantly in this case, it resolves(), not rejects().
+
+this means the catch() callback (this is a catch() and not a then()) is never called, and 3 is never output. the promise the catch() returned DOES resolve, so the following then() callback is called, outputting 4, giving us 1,7,2, and 4 so far.
+
+After the 4 is output the next then() callback is called, which throws an error. Inside a promise, a thrown error results in a rejected promise. This means the next then() callback (the one that would output 5) is not called, but the promise that the then() returned rejects (essentially passing on the rejected promise it received).
+
+That rejection would fall through any number of then() statements and end at the next catch() statement, but the next statement is a catch, so that is the callback that is called. This callback does not output anything, but returns "okay". A catch() callback that does not return a rejected promise or throw an error resolves the promise that the catch() originally returned, so (following the same logic as the past two examples) we will look to the next then() clause - which happens to be the next statement, and that callback logs out 6, so we have gotten 1,7,2,4, and 6.
+
+At this point nothing ever did anything (or even saved the value) of the promise returned by that final then() call, so no further steps happen. The JS engine returns to the event loop, waiting for an event. (Note that the JS engine returned to the event loop after EACH promise callback)
+
+The console.log(7) is not executed again, because that is not part of the queue of code waiting for an event to respond to the way each of the promise callbacks were.
+
+Also, notice that in this particular case, the speed of the functions that resolved promise had no impact on the results, because this was a single series of steps - a slow resolve would change how long the entire series took to complete, but would not impact the ORDER.
+
+It is possible to run events in parallel, in which case the speed DOES matter. The code here was serial because each step (callback) only started when the previous had completed, and not before. Consider this code:
+
+console.log('before');
+returnsAPromise1()
+.then( () => console.log(1);
+
+returnsAPromise2()
+.then( () => console.log(2);
+console.log('after');
+
+Here we know the output will begin with 'before', and then 'after'. In this pass the functions that return promises are called, and the then() methods of those returned promises are called, but those then() methods don't CALL the callbacks they have immediately. Instead they are effectively assigned to event listeners, but instead of listening for a 'click', they are listening for the promise resolving.
+So we begin with 'before, register some listeners, then 'after'. Once the code is done executing, it enters the event loop, waiting for something to match a listener. As soon as one of those promises resolves (which it could be already - that status isn't checked until you hit the event loop) it will run the assigned callback. BUT, the code we have doesn't let us know if Promise1 or Promise2 will resolve first. Assuming both resolve() at some point, we will get 'before', 'after', and then 1 and 2 with those last two being in an unknown order.
+
+Promises can be very hard to wrap your mind around, but many of the concepts involved (such as the event loop) apply even when you have no promises involved at all, and it is very easy to get confused when dealing with async work with/without promises (promises are just an organizational tool - we can write all of the above code with callbacks, but it would be much messier), so it's worth understanding.
+
+Q3: What does "resolve" mean versus "reject" in terms of a Promise?  What happens as a result?
+
+A3: 
+resolved is the 'success' final state of a promise.  The promise entered that state (resolves) with a value (may be undefined). After the promise resolves it will execute the appropriate callback and then resolve the promise it returned when it was given that callback with the return value of that callback.  That callback is called with the value this promise resolved with.  The execution of the original success callback occurs after all currently running code is complete and we enter the event loop.
+
+
+Example: 
+
+Note: "event queue" is used here, but it is an abstract concept that you shouldn't try to understand beyond the big picture for now (or maybe ever - I certainly don't know it beyond the abstract.  "Event loop" is similar - it works perfectly fine to imagine it as a infinite loop with a simple array that items are added to or removed from because that image tells you the behavior to expect, but I have no idea if that is an accurate depiction of how the engine implements internally.
+
+Imagine this sequence of events
+
+Promise A is created
+Promise A is given a success callback (via then()), and Promise A returns a new promise, Promise B
+Promise A is resolved - nothing immediately happens beyond Promise A noting the value (possibly undefined) it was resolved with, and putting an event in the event queue
+Current Code execution completes - nothing else to run yet, so JS engine enters "the event loop", regularly checking an event queue of some sort to find something to react to.  When it finds an event, it runs any handlers that event in turn, then returns to check the event queue for another event, repeatedly checking until it one occurs.
+The resolution of Promise A is one such event to react to, so it happens, and code execution begins
+
+Promise A calls the success callback it was given, passing it the value that Promise A was resolved with.  The return value of the callback is the value that Promise A will resolve Promise B with, subject to the details below.  (Promise A created and returned Promise B, so it still has a reference to be able to resolve or reject Promise B)
+If the success callback for Promise A throws an error (or returns a rejected promise), Promise B will be rejected with the error or the value a that returned rejected promise was rejected with.
+If the success callback for Promise A returned a resolved Promise, Promise B will be resolved with the resolve value of that returned promise.
+If Promise A did not have a success callback, Promise B will be resolved with the value Promise A was resolved with.  (This is what allows us to "chain" then() and catch() clauses - see Promise Chaining below.
+
+Once the event handler that is reacting to the resolve has finished running the appropriate callback and telling Promise B to resolve or reject, current code execution completes, and the JS engine returns to checking for events to react to.  (The resolving/rejecting of Promise B may be one such event...)
+
+Promise A in a final state.  The then() and catch() methods can still be called, and they will still generate and return a new promise, and that promise will be immediately resolved() or rejected() appropriate to the state of Promise A and the value it was given for that state.  But Promise A cannot be resolved again, nor rejected again, nor set to pending.
+
+Had Promise A been rejected instead of resolved, the process is very similar:
+
+Promise A calls the failure callback it was given (given via its own catch() method), passing that callback the value that Promise A was rejected with.  The return value of that callback is what Promise B will be _resolved_ with (not rejected, even though the value is coming from a failure callback), subject to the details below.  
+If the failure callback throws an error, Promise B will be rejected with that error as the value.
+If the failure callback returns a rejected promise, Promise B will be rejected with the value that promise was rejected with.
+If Promise A did not have a failure callback, Promise B will be rejected with the value that Promise A was rejected with.  (see Promise Chaining below)
+
+Once the event handler that is reaction to the rejection has finished running the appropriate callback and telling Promise B to resolve or reject, we return to waiting for an event.
+
+-= Promise Chaining =-
+
+We can have an infinite list of "chained" .then()/.catch() clauses ("chained" meaning it is a series of methods calls, each invoked upon the return value of the previous).
+This is because both the then() method and the catch() method on a promise return a new promise, and that promise will be resolved by the creating promise once the creating promise knows which to do.
+The creating promise, after reaching a final state, knows whether to resolve or reject a created promise when either:
+* the callback finishes (the callback for the state the creating promise is now in, that the creating promise was given in the then()/catch() method when it created this promise that is being finished
+OR
+* the creating promise does not have a callback for the state that the created promise finished in
+
+In either case, the created promise is itself resolved/rejected.  The one complication is if the value that it would be resolved/rejected with is itself a promise.  (technically, a "thennable" - having a then() method.  Duct-typing at work.)
+
+If the value to resolve/reject with is a promise, the effect will be that the created promise will resolve/reject as that promise value resolve/rejects.  If that has not happened, then the created promise is not resolved/rejected.  That's the effect - I'm not certain on the methodology - I can think of a few ways to do so and don't which is used where, but the pratical matter is the impact - it will behave as if the created promise will resolve/reject with the value of any promise that it would otherwise resolve/reject with.
+
+These rules are fairly straightforward, even if takes a lot of word to explain them.  The elegant thing is the emergent properties of these rules.
+
+You can create asynchronous tasks and yet control which tasks can run in parallel, and which ones have to run in series relative to which others, just by chaining and occasionally nesting as needed any number of callbacks that are called by promises and may create and return some.
+
+Q4: When using fetch(), what is different when sending a GET request vs a POST request?
+
+A4: 
+I was not clear here on whether I was asking about syntax, operation, or conceptual.  (I had operation in mind, but that wasn't clear)
+
+Syntactically: 
+
+method: 'post' in the options object vs method: 'get' or allowing the method opetion to default to 'get'
+
+Operation:
+
+GET via fetch cannot accept a 'body' option to include data in the request body
+fetch() does not enforce REST concepts, so none of that regarding GET/POST applies as an operation
+
+Conceptual:
+
+Treating "fetch()" as a proxy for "calling web services", the major differences in the _expected_ usage are:
+GET does not have data in the request body
+GET is idempotent - running it should not change the data
+GET is intended for requesting data
+POST is intended for creating server-side change, possibly using any passed data from url params and/or request body
+
+However, as a practical reality none of the above is enforced by HTTP and there are servers and services that violate one or all of these.  Of them, only the first (GET has no request body) is enforced by fetch().
+
+INCORRECT: Anything to do with JSON - there is no data format differences between these, and they can both use or not use JSON (thought GET isn't supposed to put it in the request body, it can still put it in a url param
+INCORRECT: Anything to do with headers, speed, or security.  
+
+Q5: If I have a function doStuff() that ends in: return Promise.resolve( someValue ); 
+How would I be able to get someValue from outside the function?
+
+A5: 
+doStuff() returns a promise, so if you have that promise you can call then() on it, giving it a callback that will receive someValue.  That callback will be called asynchronously, however, so anything that depends on using someValue must also be set to trigger asynchronously.  (For example, by being in or called from the callback, or by using promise chaining to attach subsequent steps)
+
+Q6: What can you tell me about the return value of the then() method of a promise?
+
+A6: 
+then() returns a new promise.  This promise will finish (resolve or reject) only after the creating promise, and will resolve/reject based on (that is, determing state and value it will resolve/reject with from the return value of the callback) the either the return value of the appropriate callback that then() passed to the promise it is the method of, or the new promise will resolve/reject to adopt the state and finish value of the promise the then() is attached to if then() was not given a callback for the corresponding state.
+
+Q7: Why does the following code not work as intended?
+
+try {
+  returnsAPromise()
+  .then( (value) => { console.log( value.paws ); } )
+} catch (err) {
+  console.log('looks like that was not an object, it threw an error');
+}
+
+A7: 
+try/catch is a synchronous operation.
+Here, returnsAPromise() will run, returning a promise (all synchronous)
+The then() method of that promise will be called - it saves the passed callback internally, and returns a promise
+That completes the try block, so only errors in those calls will be caught by the try/catch - the callback passed via then() has never had a chance to run, even if the top-level promise was returned as already resolved.
+Once current code execution is complete and the JS Engine starts checking the event queue, that is the first time the callback might get called (and thus throw an error), and that is outside the try/catch operation
+
+Also, JS Engines currently vary in their handling of uncaught errors with promises:
+One engine might throw an error from a promise that is rejected with an error but has no created promises that have chance to handle it.
+Another engine might give a warning when this occurs
+Another engine might say nothing at all, and the error (which can be an actual problem) will not be reported in any way, creating very subtle bugs
+
+That last is currently the most common response to uncaught errors with promises, and thus why you always have SOME sort of catch() at the end of a promise chain.
+
+Q8: When using fetch, we often follow it with two then()s, like this:
+
+fetch(someUrl)
+.then( (response) => response.json() )
+.then( (json) => doStuff(json) )
+.catch( (err) => console.log(err) );
+
+What does the first then() do compared to the second?  Why do we have two?
+
+A8:
+The first then callback is handling the response object.  In this case its assuming that the response will contain properly-formatted JSON in the response body, and resolving the returned promise with that parsed JSON.  Were there to be more involved reactions to the response (such as checking status codes, headers, etc), it would begin in this first then() callback.  If there were problems reaching the service, this then() callback would never be called (nor the second, in this example).
+
+The second then is handling the parsed JSON.  It has no knowledge of the response object. 
+The second has to be separate from the first because response.json() (and all methods to access content of the request body) is itself asynchronous (I am not positive, but this is probably to be able to handle connections that send data over a longer-lasting connection.  You get the response headers, and the start of the body, and you can being reacting to those before the rest of the request body is fully loaded.)
+We benefit from the second then() being a separate step because it helps focus on a single responsibility for each part, and prevents unnecessary coupling.  (these examples are very small, but even a slightly more involved example would get more complicated if you could and did combine the two steps)
+
+Q9: When do you know that you the then/catch callbacks will NOT run until later?
+
+
+A9:
+While current code is expecting.
+Even when the system is looking for events, then/catch() callbacks will not run before the promise they are attached to resolves.
+
+Q10: What other concept is an alternative to using promises?
+
+A10: 
+Callbacks.  Promises themselves are just a convenient way to organize callbacks - functions that passed as an runnable object to other functions, so that function controls when the callback is called.  
+
+B1: What is a benefit of promises over the alternative you listed in #10?
+
+AB1:  
+With callbacks, nesting is always an issue.  If you use only named functions as callbacks to avoid nesting, then you've scattered the chain of steps in different places, making it harder to understand 
+If callback D is called by callback C, and callback B and callback C are both called by callback A, I cannot easily see by looking at callback A that D is involved.  I have to be looking at the code for callback A AND callback C to see that.  
+In contrast, because promises resolve/reject with the state of promises they themselves are resolved/rejected with AND are chainable, I can "flatten" (reduce levels of nesting) the nesting without removing the calling structure - A callback has to call another function, and thus call the callback, inside its code, while a promise makes such associations OUTSIDE its code.  
+This movement of the control of sequence also lets me separate the decision of sequencing from the handling of data.  A function that returns a promise that will receive some data does not need to be given the callback to send the complete data to.  Instead, some OTHER function can take that promise and attach handlers to it.  This reduces coupling and allows for easier modularity.   Nothing that cannot be done with callbacks, but built in, and doing it with callbacks would start to look a lot like a promise.
+
+B2: Why do we use fetch() instead of XHR?
+
+AB2:
+XHR is a "low-level" API, offering a greater level of detail and control in the HTTP Request/Response process, but having correspondingly involved steps to handle the common, less involved cases.  
+Fetch is a "high-level" API, meaning that it has lower complexity and is less involved to use for the most common cases when it comes to creating a request, sending data, and handling any response.  
+Fetch is also promise-based from the start, while XHR is callback-based.
+Fetch is also more rigorous in applying browser security standards.  That's not _helpful_ to the developer for some common cases (even if good overall), but if you can make your code work with fetch you can have more confidence that upcoming browser versions that finally add those restrictions to XHR won't break your code.
+
+B3: When we call code "async", what does that mean in practical terms?
+
+AB3: 
+
+async actually covers two kinds of code:
+* Code that is system code and runs separate from user code.  If I request a url, then do a huge for() loop, the JS Engine may very well run all the system code that makes network connections and manages file systems to get data from the url in parallel with my user code, getting data over the wire at the same time my for loop is running.  BUT nothing in my code, including anything reacting to the loading of that url, will execute before my currently running code has completed and the engine is ready to react to an event.  This sort of async code is talked about very abstractly, and largely only because of the other kind of async code.
+* Code that is user-side code and is set to trigger(start execution) from some async ( first definition ) code.  Though this user code will itself execute synchronously relative to itself (statement 2 will only run when statement 1 is finished, and statement 3 will not run until statement 2 is finished), this user code is also running out of order from the code that assigned it to some async (first definition) event.  
+

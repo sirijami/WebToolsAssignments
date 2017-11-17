@@ -1,0 +1,341 @@
+INFO6250 Summer 2017 - Exam 1 - Answers
+
+You are welcome (encouraged) to use the web to help with anything but you do have limited time.  
+There may be some syntax and/or DOM functions you are unfamiliar with - the Web can help.
+Many question are asking WHY and you may find differing opinions online so it is better to rely on the material from class.
+Do NOT copy any text from online.  I want your understanding of things.
+
+BE DETAILED!  When the question is asking a "why do you.." or "when do you..." make sure your answer involves useable reasons.  Any answer that says in essence "when you want to" is likely not enough.
+
+Be sure to answer _all_ parts of a question.  Different questions are worth a different number of points.
+
+If in doubt, write something because partial credit is an option.  Don't use up so much time that you don't get to every question.
+
+There are no syntax trick questions - if you think there is code that will not run, assume it is a typo and should run.
+----------------
+
+Q1 3 :  JS inheritance is not Classical Object Oriented inheritance.  Explain how the statement "every object can be inherited from" relates to the difference in the two types of OOP inheritance.
+
+A1:  In classical OO, an instance inherits from a class, which is not an actual modifiable object but is instead a "blueprint" for any instances of that class, describing how those instances will behave, what properties and methods they will have, and what any inheritance chain to a super class would be.  In JS inheritance (Prototype Inheritance), each object inherits from a "prototype", which itself is another actual object (that could potentially have yet another object as _its_ prototype.  Prototypes can be modified and extended after instantiation, while classical OO inheritance doesn't involve classes that can be modified after their declaration.
+
+Q2 6 :  There are 4 ways to create inheritance in JS.  List all 4 of them (names do not have to be perfect, but should clearly identify which way you mean) AND give an example of _two_ of them that involves a variable named "instance" with an _inherited_ method called "hello" that, when called, will console.log('hello');  Be sure to say which example is which form of causing inheritance.
+
+A2:
+1) Constructor Function:  
+  function Example() {}
+  Example.prototype.hello = () => console.log('hello');
+  const instance = new Example();
+
+2) Object.create()
+  const example = { hello: () => console.log('hello') };
+  const instance = Object.create(example);
+
+3) Brute force the prototype
+  // The syntax to modify the prototype varies based on JS engine/platform
+  const instance = {};
+  instance.prototype.hello = () => console.log('hello');
+  OR
+  instance.__proto__.hello = () => console.log('hello');
+  OR
+  Object.getPrototypeOf(instance).hello = () => console.log('hello');
+
+4) ES6 Class syntax
+  class Example {
+    hello() { console.log('hello'); }
+  }
+  const instance = new Example();
+
+Q3 3 :  What is falsey vs truthy? (not what values are which, but the descriptions of the categories)  How does this relate to when you should use strict comparison and when you should not?  
+
+A3:
+Falsey are those values that will be considered 'false' in a boolean context.  Truthy are those values that will be considered 'true' in a boolean context (and technically are all values that are not Falsey).   Strict comparison should be used any time you are doing a comparison that ISN'T relying on a truthy/falsey evaluation.  Strict comparison disallows coercion, so values that are not boolean will not be forced into a boolean context.  Because coercion can lead to unexpected results, it is generally avoided.  However, using truthy/falsy values makes for more readable code (because neither == nor === is involved) so it is accepted so long as you consider the falsy case.  (For example, checking a number for a falsy value does not work as intended if 0 is intended to be an acceptable answer)
+
+var value = 1234;
+var foo = '1234';
+if( value === foo ) {} // strict, so OK
+if( value ) {} // not-strict, but relying on truthy/falsey, so OK
+if( value == foo ) {} // not-strict, and not relying on truthy/falsey, so NOT preferred.
+
+
+Q4 6 :  The imaginary language FakeCode is dynamically-typed and strongly-typed.  
+    I have some FakeCode code that sets variable "fake" to hold a String value.
+    I have some JS code that sets variable "real" to hold a String value.
+    Based only on this difference: (the languages are otherwise the same)
+      What can FakeCode do to/with "fake" that JS cannot do to/with "real", if anything?
+      What can FakeCode NOT do to/with "fake" that JS _can_ do to/with "real", if anything??
+      What can FakeCode do to/with "fake" that JS can also do/with "real", if anything?
+
+A4:
+FakeCode can have confidence that the string in "fake" will never be treated as anything other than a string (it will not be automatically converted to any other type), 
+while JS has to worry if "real" + 2 results in a string that ends in "2" or an number that is 2 larger than "fake".
+FakeCode cannot rely on autoconversions like truthy/falsey, or switching between a string of numbers and actual numbers, but JS can.
+Both FakeCode and JS can reassign the "real" and "fake" variables to hold data of a different type.
+
+Q5 4 :  When NodeJs runs on a server, there is no native DOM available.  Why is there no DOM in that JS, and what is the DOM anyway?
+
+A5: The DOM is an object representation of the rendered page in a browser.  In a NodeJS program, there is no page and no browser.
+
+Q6 6 :  Given the url: http://words.example.com:2017/something/else/
+    and a server that is configured with:
+      a default file of 'index.html'
+      a web root folder of /place
+    and the relevant DNS entry gives an IP address of 192.0.1.1
+    and the server gives a static response:
+      describe what happens _in detail_, using every part of the URL.
+A6:
+The browser will check DNS to translate the domain of the URL (words.example.com) into an IP address (192.0.1.1)
+The browser will send an HTTP request to port 2017 of the computer at TCP/IP address 192.0.1.1
+The server will consider the path of the requested URL (/something/else/) and match it to the /place/something/else/ directory on its filesystem.
+The server will not the URL does not include a filename in the path, so it will look for index.html in the /place/something/else/ directory.
+The server will return an HTTP response to the browser that has the content of index.html as the body of the HTTP response.
+
+Q7 6 :  If I am viewing the page http://different.example.com/something/more.html 
+    and it has:
+      a script tag with src="code.js"
+      a second script tag with src="extra/code.js"
+      a link tag with href="/styling.css"
+      a link tag with href="http://crazy.example.com/styling.css"
+      an img tag with src="../cats.png"
+      an input tag with type="checkbox"
+    Give me the full URLs for any requests made when this page is loading
+A7:
+
+  Relative paths (not starting with a "/" or a fully qualified URI) are relative to the current directory (in this case, the path of the current URL)
+  ".." means "parent directory".
+  Absolute paths (starting with a "/") are relative to the root of the url path.
+  Paths with domain names are not relative to either and ignore the context of the current URL.
+  Any input field (including checkbox) does not generate a request unless the form is submitted.
+
+    http://different.example.com/something/code.js
+    http://different.example.com/something/extra/code.js
+    http://different.example.com/styling.css
+    http://crazy.example.com/styling.css
+    http://different.example.com/cats.png
+
+Q8 6 :  Give me some HTML below that involves:
+      a dropdown box with two visible options: "Cats" and "Dogs"
+      a button that says "Choose wisely"
+    make it so that when you press the button the generated request:
+      will use a path that involves the a file named "choosing" (no file extension) in the "risky" subdirectory from wherever this page is hosted
+      ends in either "?choice=rulers" or "?choice=droolers" depending on your dropdown choice
+    Do this without any JS  (hint: the HTML for each item in a dropdown has an optional 'value' attribute)
+
+A8: 
+
+  <form action="risky/choosing">
+    <select name="choice">
+      <option value="rulers">Cats</option>
+      <option value="droolers">Dogs</option>
+    </select>
+    <button type="submit">Choose Wisely</button>
+  </form>
+  
+Q9 4 :  How does the stateless nature of HTTP relate to search engines?  
+    How does it impact having multiple browser tabs open to different dynamic pages on the same server?
+    (This is looking for how the stateless-ness impacts how those things work/don't work)
+
+A9:
+Because HTTP is stateless, you can request any URL without having to navigate to that page.
+Search Engines give us the URL of pages without regard to any pages they passed through to get to them.
+When I have multiple browser tabs on the same site, the server does not know whether I have multiple tabs open or if I'm just bouncing between URLs on the same tab, because the server session does not maintain any state information about my connection.
+
+Q10 4 :  List two considerations in picking the rules for a linter assuming you/your team has NO current conventions.
+
+A10: 
+
+* We should choose rules that catch syntax that is more likely to be a logical error (not a syntax error) that it is likely to be deliberate.  These rules should reduce the number of bugs, because logical errors are only found in testing (if they are even found then) while syntax errors are found as soon as the code attempts to execute (or is passed through a linter).  An example of this kind of rule is declarign a variable in the same scope twice.
+
+* We should choose rules that improve the readability/skimability/clarity of the code.  The coding patterns enforced by these rules do not usually impact the execution of the code at all, but can impact how clear parts of the code are to someone reading it, ranging from `if` blocks looking the same in all parts of the file (and in all files) to making sure that whitespace is applied consistently so that someone's brain doesn't miss a piece of code just because it didn't follow the expectations set by the rest of the code.  An example of this kind of rule is a rule stating where the `{}` of an if/else block should appear, same line/different line, or a rule ensuring that indentation is done with only tabs or only spaces, but not both.
+
+* We should choose rules that encourage us to avoid legal syntax that is likely to lead to a logical error in the future.  This is not currently a syntax error nor a logical one, but it's likely to lead to a logical error.  An example of this kind of rule is requiring that you never use an `if` without a block.  `if` statements without a block are legal (only the next statement will have execution impacted by the conditional), but it very easy for the next person to come along to not realize that this `if` didn't have a block when they add an indented line intended to be impacted by the conditional, but in execution it won't be.  Having a rule banning this behavior will prevent people from creating the potential for easily-made future logical errors in the first place.  
+
+* We should NOT choose rules that catch legit, safe, and intended code more often than they find actual problems we want to change.  Such rules will just add work and create "noise" in the code (in the form of comments that tell the linter to not yell about this particular instance).
+
+* We should NOT choose rules that make the code less clear, according to the subjective tastes of our group.  Many rules have opposite versions, because for every coder that likes using spaces to indent there is one that likes using tabs.  For every coder that likes grouping properties alphabetically, there is one that prefers to group properties that are related by purpose rather than the letters involved.  There are even rules to require semicolons be present and others to require they NOT be present.  We should find rules that work for our brains and with each other, and use those, and not apply rules for no reason.
+
+Q11 6 :  I have a directory that contains a package.json the includes a single dependency, a library named "reliable"
+    How do the commands `npm install` and `npm install something-else` differ when run in that directory, and what do they do?
+    (assume all libraries involved actually exist)
+
+A11: 
+npm install will try to install all dependencies listed in package.json.  In this case, "reliable".
+npm install something-else will try to install the something-else library into the local node_modules directory.
+
+
+Note: The next few questions are about this code:
+
+    const Dictionary = function( size ) {
+      this.size = size;
+      this.words = {};
+    };
+
+    Dictionary.prototype.add = function( word ) {
+      if( this.size > Object.keys(this.words).length ) {
+        this.words[word] = true;
+      }
+    };
+
+    Dictionary.prototype.addMany = function( words ) {
+      const self = this;
+      words.forEach( function( word ) {
+        self.add( word );
+      });
+    };
+
+    Dictionary.prototype.makeRemover = function () {
+      const copy = this.words;
+      return function( word ) {
+        copy[word] = false;
+      };
+    };
+
+    const words = ['cat', 'dog', 'chicken'];
+    const storage = new Dictionary(2);
+    storage.addMany( words );
+    const remover = storage.makeRemover();
+    remover('cat');
+
+Q12 6 :  What is the line `const self=this;` doing?  Why is it there?  What is one alternative option?
+
+A12:  The value of the context ("this") will be redefined when a function call is made, in this case when the anonymous callback function passed to forEach is called (presumably called without any implicit binding, so "this" becomes the global context).  If the callback attempted to call this.add(), instead of running the add() method of the Dictionary instance it would try to run the global (and likely non-existant) add() function. 
+    The 'self' variable preserves the current value of this.  When the anonymous callback is called "inside" the forEach, the context of that call will be the implicit binding: what is before the dot when the function is called, in this case "self", which still holds the old value of "this" - the Dictionary intance.
+
+Alternatives: 
+
+An explicit binding on the callback to the current value of 'this'
+
+    Dictionary.prototype.addMany = function( words ) {
+      words.forEach( function( word ) {
+        self.add( word );
+      }.bind(this) );
+    };
+
+Make the callback use an arrow function, which will create an explicit binding to the 'this' value at the time the function is defined
+
+    Dictionary.prototype.addMany = function( words ) {
+      words.forEach( ( word ) => {
+        self.add( word );
+      } );
+    };
+
+Q13 5 :  this.words is defined as an object.  What is a method that could be added that would benefit from this.words being an object instead of an array?
+
+Arrays are best for data in which the order matters. 
+Objects are best for data in which the order doesn't matter, but there is some key you can use to find the element you want.
+
+Any function that needs to check for the presence of a given word would benefitt, such as hasWord().  These functions would not have to iterate through all words in the array until it found the matching word (or ran through the entire array without finding it), but simple check for to see if this.words[word] is true;
+
+Q14 3 :  Every variable in this snippet is declared as 'const' - why is that preferable to using 'var' or 'let'?
+
+Const is block-scoped instead of function-scoped (which var is), which is an advantage if you want that, but isn't inherently better.
+Const (like let) does not 'hoist', meaning that prior to the declaration the variable does not exist.  This avoids some degree of confusion, but this is true of let as well.
+Const serves as a signal to the reader that the value assigned will not change.  If that's a primitive, that variable is now a constant.  If that's an object/array, the contents may change, but which object/array it is will not change.  In particular, this means that you can use let as a signal that the opposite is true: this value can change, and because const is preferred, when you see let you KNOW the variable gets reassigned somewhere in the block.  If you used let where you could use const, the use of let carries no additional meaning, so we prefer const in order to give let more meaning.
+
+Q15 4 :  The makeRemover method is an example of what concept?  
+
+This is a closure - the function returned by makeRemover has access to the "copy" variable, even when that returned function is run in a scope that has no concept of "copy".  
+
+Q16 4 :  After this code is run, storage.words.cat is false.  Why is that, when it was true before remover() was run, and nothing in makeRemover assigns to this.words?
+
+"copy" points/refers to the same object that this.words did.  Accessing and modifying that object through either refernce (this.words or copy) will modify the same object and read the same object.  
+
+Note: end of questions about the code above
+
+Q17 6 :  When are you likely to lose the current context ('this')? 
+    What are two ways to have your code work as intended in such a situations?
+
+Q18 6 :  Changing this HTML:
+      <script> function setTimeout( duration ) { this.duration = duration; } </script>
+      <button onClick='setTimeout(9)'>Set Duration</button>
+    Into this HTML:
+      <script> 
+        function setTimeout( duration ) { this.duration = duration; } 
+        document.getElementById('button').addEventListener('click', () => setTimeout(9)');
+      </script>
+      <button id='button'>Set Duration</button>
+
+    Provides two benefits, what are they?
+    There is no IIFE here, what _specific_ impact does that have in _this_ example?
+    If an IIFE was here to change that impact, why can an IIFE change it?
+
+A18: 
+Benefits:
+1) You can add additional event listeners to button without overwriting the existing one
+2) You no longer have JS directly in the middle of an HTML tag.
+
+Impact: 
+* the global function setTimeout has been overwritten.
+
+How does an IIFE change that?
+* An IIFE has the code run inside a function.  A new function means a new scope.  Any declarations/definitions within that scope do not modify the outer scope.
+
+      
+Q19 6 :  Given the following content:
+      <script>
+        const mole = document.createElement('button');
+        mole.textContent = 'Whack Me!';
+        const addMole = () => document.getElementById('moles').appendChild( mole.cloneNode(true) );
+        const whackTheMole = (event) => event.target.remove();
+        document.getElementById('moles').addEventListener('click', (e) => whackTheMole(e) );
+        const randomMole = () => { 
+          addMole();
+          setTimeout( randomMole, Math.floor(Math.random() * 4000) );
+        };
+        randomMole();
+        randomMole();
+        randomMole();
+      </script>
+      <ul id="moles"></ul>
+
+    You have a (very) basic "whack-a-mole" game.  
+    Why does it work without attaching a listener to each 'mole' element?
+    What concept is that aspect of the code demonstrating?
+
+A19:
+This is an example of 'event bubbling' - any event on an element (in this case the mole buttons) will also check the containing tag for any listeners, and then its wrapping tag, and so forth to the document root.  In this case, the listener on the UL tag catches the event bubbling up from the mole LI tags.
+
+Doing it this way is far more convenient to understand and maintain than attaching a listener to every button, particularly when so many buttons are being created and removed.
+
+Q20 6 :  Given this code:
+    <script>
+      for(var i = 0; i < 3; i++) {
+        var button = document.createElement('button');
+        button.textContent = i;
+        button.addEventListener('click', () => { console.log(i); } );
+        document.getElementById('buttons).appendChild(button);
+      }
+    </script>
+    <div id="buttons"></div>
+
+    The intention is to get three buttons, labeled 0 through 2 (that works)
+    and have those buttons log out their corrosponding number (that isn't working)
+    Instead, each button logs "3".   
+    Show me the small change to the code that makes it work as intended, WITHOUT adding data to the button element (no dataset or other attributes), AND tell me why it didn't work before and why your fix fixes it.
+
+A20: Change the var to a let in the for loop.   
+
+The var is function-scoped (and hoisted) and retains the value it had at the end of the loop (i === 3).  The button event listener has a reference to i - in fact each of the 3 event listeners all refer to the same 'i', which at the time we RUN those callbacks, will be 3.    
+
+Bonus questions:
+
+B1: I'm writing a program to manage recipes.  Give me an example object(s) to manage my data.  What are some operations/actions I'd want to apply to this data to fulfill my goal of a recipe program/site.
+
+B2: RESTful is not REST, but takes a few concepts from REST.  Describe two.
+
+RESTful is an informal term used to indicate a service is inspired by REST without being techincally complete REST.  The borrowed concepts include:
+
+* URLs as resource identifiers rather than being disconnected to what they operate on, and in particular not having verbs
+* using the HTTP methods to describe actions done to the resource 
+* using HTTP status codes to reflect information about the resource
+
+B3: Give at least 2 reasons I might want to use a transpiler.   Give me at least one reason I might _not_ want to use a transpiler.
+
+B4: I have a function that isn't working as intended and to figure out the problem I need to consider the values of many variables at several points in the code.  What is the best way for me to do this, and why
+
+B5: "JSON is not Javascript" - explain this statement and at least two big reasons why it matters?
+
+
+
+      
+
+    

@@ -1,0 +1,84 @@
+Q1: Why do you want to have separate JS, CSS, and HTML files?
+
+A1:
+
+* Separation of concerns: By ensuring that each file has a limited set of responsibilities, it makes it easier to locate a particular piece of material and easier to know the scope of the change.
+* Modifying these represent different skillsets that may belong to different people or roles.  Having them in separate files makes it easier to focus and avoid interference with other people.
+* Tooling (such as linters, IDEs, and other options) have an easier time if each file has a single datatype rather than embedding different datatypes within another.
+
+Q2: Why do you NOT want to use alert() outside of class demos?  
+    (including not wanting to use it while debugging)
+
+A2:
+
+* alert() is a jarring (and unattractive, unstylable) experience for users
+* alert() is blocking - many functions of the browser and/or page will not execute until the alert is dismissed, which makes it more jarring and complicates any debugging, because the experience while debugging will be different than the normal experience.
+
+Q3: What is event bubbling?
+
+A3: Event bubbling, also known as Event Propagation, is where DOM events (such as click, keypress, change, etc) will first check their corresponding element for handlers, then their containing element, and continue on with each enclosing element until they either reach the document or encounter a handler that stops this propogation.
+
+Q4: What is the difference between class and id in HTML?
+
+A4:
+
+* id is an HTML Element attribute that must be unique within the document.  As a unique and identifying attribute, the DOM has particular options keyed to it (such as getElementById, and that you can read from/assign to Element.id directly).  IDs are commonly targeted in CSS selectors to apply styling rules.
+* class is an HTML Element attribute that is interpreted as a space-separated list of classnames for the element.  In addition to being a valid target for the DOM to target (getElementsByClassName()), and the extended DOM methods to alter the list (.classList.*), the classnames are also commonly targeted in CSS selectors to apply styling rules.  This may be done where classes are used as most-likely-unique identifiers (where you would use ID but can't absolutely guarantee uniqueness on the page) or as more broad targets where you expect that there may be multiple matching elements.
+
+Q5: Which will you do more of, reading code or skimming code?
+
+A5: You will skim code more often than reading it - skimming involves moving rapidly through a code base to find which area applies to your current concern, whereas reading involves actually checking each line of code to understand precisely what it is doing.
+
+Q6: Which will you do more of, writing code or debugging code?
+
+A6: You will debug code more often than write code.  Debugging consists of finding how the code does not match expectations, and while it is nice to write code that behaves perfectly the first time, that is also relatively rare.  Even a single line that requires debugging can occupy much more time than writing a relatively larger number of lines of new code.
+
+Q7: Why do we use addEventListener() in JS instead of onEvent="" in HTML?
+
+A7: 
+
+* inline on(Event) handlers in HTML require that the Javascript be embedded in the HTML, which violates all the reasons you don't want to do that (see Q1)
+* inline on(Event) handlers in HTML (or applied directly to the DOM Element Node) mean that you are limited to a single event listener/handler, limiting and complication any attempt to have an event trigger multiple handlers.
+
+Q8: Why should you not use the DOM as the source of truth for data storage?
+
+A8: 
+
+* The DOM is subject to change from multiple sources, including any number of JS scripts on the page, which threatens the accuracy of your information.
+* Using the DOM as data storage couples your presentation of the data with your storage of the data.  If you modify the presentation (say, by sorting, or filtering) your stored data is likewise modified.  As your data and data presentation become more complex, maintaining the completeness of your data while not violating the presentation of the data becomes dramatically more complex, as reading or writing the data means you must also understand and interpret/recreate the current presentation (which, of course, can change), so even simple data manipulation such as "add", "delete", or "edit" starts to have multiple cases to concern yourself with, where separated presentation and storage do not have that concern.
+
+Q9: (2 points)
+
+    Write the best JS to make clicking this button add the next number to the list
+    WITHOUT reading from the DOM
+    Assume the JS is being loaded onto the page already.
+    You are welcome to use the Web, but be aware of time limits!
+
+    <ul id="list">
+       <li>1</li>
+    </ul>
+    <button id="add">What is next?</button>
+
+A9: One answer:
+
+var next = 2;
+var list = document.getElementById('list');
+var addButton = document.getElementById('add');
+addButton.addEventListener('click', function() {
+  var el = document.createElement('li');
+  el.textContent = next;
+  next = next + 1;
+  list.appendChild(el);
+});
+
+B1: Why do we have the <link> tag at the top of the HTML, and the <script> tag at the bottom?
+
+AB1: The link tag is at the top of the page because we want the CSS to be loaded and interpreted as soon as possible, so any content is displayed styled rather than unstyled.  The script tag is at the bottom because we don't want to delay presentation of the content by waiting for the script to load.  Also, if the script is at the bottom of the page, the JS can safely assume that the DOM structure is loaded and available, whereas if the script tag was at the top, the script would be loaded and executed before the full DOM contents were available.
+
+B2: Why do we try to add/remove CSS classes rather than modifying the styles on an element?
+
+AB2: By using applied classes rather than inline styling we maintain separation of concerns - The JS may modify classes, but the contents of the classes is up to the CSS, not the JS.  Also, using classes allows any particular styling to be reused on other matching elements, while inline CSS must be applied to each element directly. 
+
+B3: What is a good reason to use event bubbling?
+
+AB3: If you have a collection of elements that you want to respond to events but the exact DOM elements involved may be added/deleted/replaced, having the listener on a parent element will prevent you from having to reapply listeners to the elements (including meaning that you do not have to track which elements currently have a listener and which ones don't).

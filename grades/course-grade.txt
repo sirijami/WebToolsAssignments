@@ -1,0 +1,8 @@
+Grades are now final
+
+Quizzes: A+
+Midterm: C
+Final: C-
+Project: B
+
+Class Grade: B-

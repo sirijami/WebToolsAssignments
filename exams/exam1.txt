@@ -1,0 +1,183 @@
+INFO6250 Summer 2017 - Exam 1
+
+You are welcome (encouraged) to use the web to help with anything, or to run test code, but you do have limited time.  
+There may be some syntax and/or DOM functions you are unfamiliar with - the Web can help.
+Many question are asking WHY and you may find differing opinions online so it is better to rely on the material from class.
+Do NOT copy any text from online.  I want _your_ understanding of things.  However, please consult, run test code, or any of the other tasks you'd do in a non-exam situation to further your understanding.
+
+BE DETAILED!  When the question is asking a "why do you.." or "when do you..." make sure your answer involves useable reasons.  Any answer that says in essence "when you want to" is likely not enough.
+
+Be sure to answer _all_ parts of a question.  Different questions are worth a different number of points.
+
+If in doubt, write something because partial credit is an option.  Don't use up so much time a few questions that you don't get to every question.
+
+There are no questions with secretly bad syntax to trick you - if you think there is code that will not run due to a syntax error, assume it is a typo and should run.
+
+I will be forgiving with API syntax, but I want good spacing/indentation.
+----------------
+
+Q1 (3 points):  JS inheritance is not Classical Object Oriented inheritance.  Explain how the statement "every object can be inherited from" relates to the difference in the two types of OOP inheritance.
+
+Q2 (6 points):  There are 4 ways to create inheritance in JS.  List (by name) all 4 of them (names do not have to be perfect, but should clearly identify which way you mean) AND give an example of _two_ of them that involves a variable named "instance" with an _inherited_ method called "hello" that, when called, will console.log('hello');  Be sure to say which example is which form of causing inheritance.
+
+Q3 (3 points):  What is falsey vs truthy? (not what values are which, but the descriptions of the categories)  How does this relate to when you should use strict comparison and when you should not?  
+
+Q4 (6 points):  
+     The imaginary language FakeCode is dynamically-typed and strongly-typed.  
+     I have some FakeCode code that sets variable "fake" to hold a String value.
+     I have some JS code that sets variable "real" to hold a String value.
+     Based only on this difference: (the languages are otherwise the same)
+       What can FakeCode do to/with "fake" that JS cannot do to/with "real", if anything?
+       What can FakeCode NOT do to/with "fake" that JS _can_ do to/with "real", if anything??
+       What can FakeCode do to/with "fake" that JS can also do/with "real", if anything?
+
+Q5 (4 points):  When NodeJs runs on a server, there is no native DOM available.  Why is there no DOM in that JS, and what is the DOM anyway?  
+
+Q6 (6 points):  Given the url: http://words.example.com:2017/something/else/ that was just put in the browser
+    and a server that is configured with:
+      a default file of 'index.html'
+      a web root folder of /place
+    and the relevant DNS entry gives an IP address of 192.0.1.1
+    and the server gives a static response
+
+     Describe what happens _in detail_, using every part of the URL, from the moment the user finishes the url and hits Enter.
+
+Q7 (6 points):  If I am viewing the page http://different.example.com/something/more.html 
+    and it has:
+      a script tag with src="code.js"
+      a second script tag with src="extra/code.js"
+      a link tag with href="/styling.css"
+      a link tag with href="http://crazy.example.com/styling.css"
+      an img tag with src="../cats.png"
+      an input tag with type="checkbox"
+    Give me the full URLs for any requests made when this page is loading
+
+Q8 (6 points):  Give me some HTML below that involves:
+      a dropdown box with two visible options: "Cats" and "Dogs"
+      a button that says "Choose wisely"
+    make it so that when you press the button the generated request:
+      will use a path that involves the a file named "choosing" (no file extension) in the "risky" subdirectory from wherever this page is hosted
+      ends in either "?choice=rulers" or "?choice=droolers" depending on your dropdown choice (Note: NOT "Cats" or "Dogs")
+    Do this _without_ any JS  (hint: the HTML for each item in a dropdown has an optional 'value' attribute)
+
+Q9 (4 points):  How does the stateless nature of HTTP relate to search engines?  
+    How does it impact having multiple browser tabs open to different dynamic pages on the same server?
+    (This is looking for how the stateless-ness impacts how those things work/don't work)
+
+Q10 (4 points):  List two considerations in picking the rules for a linter, assuming you/your team has NO current conventions.  Be reasonably detailed.
+
+Q11 (6 points):  I have a directory that contains a package.json the includes a single dependency, a library named "reliable"
+    How do the commands `npm install` and `npm install something-else` differ when run in that directory, and what do they do?
+    (assume all libraries involved actually exist)
+
+Note:  The next few questions are about this code:
+
+    const Dictionary = function( size ) {
+      this.size = size;
+      this.words = {};
+    };
+
+    Dictionary.prototype.add = function( word ) {
+      if( this.size > Object.keys(this.words).length ) {
+        this.words[word] = true;
+      }
+    };
+
+    Dictionary.prototype.addMany = function( words ) {
+      const self = this;
+      words.forEach( function( word ) {
+        self.add( word );
+      });
+    };
+
+    Dictionary.prototype.makeRemover = function () {
+      const copy = this.words;
+      return function( word ) {
+        copy[word] = false;
+      };
+    };
+
+    const words = ['cat', 'dog', 'chicken'];
+    const storage = new Dictionary(2);
+    storage.addMany( words );
+    const remover = storage.makeRemover();
+    remover('cat');
+
+Q12 (6 points):  What is the line `const self=this;` doing?  Why is it there/Why is it needed?  What is one alternative option?
+
+Q13 (5 points):  this.words is defined as an object.  What is a method/concept that could be added to Dictionary that would benefit from this.words being an object instead of an array?  Why does it benefit in that way?
+
+Q14 (3 points):  Every variable in this snippet is declared as 'const' - why is using const preferable to using 'var'?  Why is using const preferrable to using 'let'?
+
+Q15 (4 points):  The makeRemover method is an example of what concept?  How does that work?  Why is that useful at all?
+
+Q16 (4 points):  After this code is run, storage.words.cat is false.  Why is that, when it was true before remover() was run, and nothing in makeRemover assigns _to_ this.words?
+
+Note: end of questions about the code above
+
+Q17 (6 points):  When are you likely to lose the current context ('this')? 
+    What are two different ways to have your code work as intended in such a situations?
+
+Q18 (6 points):  Changing this HTML:
+      <script> function setTimeout( duration ) { this.duration = duration; } </script>
+      <button onClick='setTimeout(9)'>Set Duration</button>
+    Into this HTML:
+      <script> 
+        function setTimeout( duration ) { this.duration = duration; } 
+        document.getElementById('button').addEventListener('click', () => setTimeout(9)');
+      </script>
+      <button id='button'>Set Duration</button>
+
+    Provides two benefits, what are they?
+    There is no IIFE here, what _specific_ impact does that have in _this_ example?
+    If an IIFE was here to change that impact, why can an IIFE change it?
+      
+Q19 (6 points):  Given the following content:
+      <script>
+        const mole = document.createElement('button');
+        mole.textContent = 'Whack Me!';
+        const addMole = () => document.getElementById('moles').appendChild( mole.cloneNode(true) );
+        const whackTheMole = (event) => event.target.remove();
+        document.getElementById('moles').addEventListener('click', (e) => whackTheMole(e) );
+        const randomMole = () => { 
+          addMole();
+          setTimeout( randomMole, Math.floor(Math.random() * 4000) );
+        };
+        randomMole();
+        randomMole();
+        randomMole();
+      </script>
+      <ul id="moles"></ul>
+
+    You have a (very) basic "whack-a-mole" game.  
+    Why does it work without attaching a listener to each 'mole' element?
+    What concept is that aspect of the code demonstrating?
+
+Q20 (6 points):  Given this code:
+    <script>
+      for(var i = 0; i < 3; i++) {
+        var button = document.createElement('button');
+        button.textContent = i;
+        button.addEventListener('click', () => { console.log(i); } );
+        document.getElementById('buttons).appendChild(button);
+      }
+    </script>
+    <div id="buttons"></div>
+
+    The intention is to get three buttons, labeled 0 through 2 (that works)
+    and have those buttons log out their corrosponding number (that isn't working)
+    Instead, each button logs "3".   
+    Show me the small change to the code that makes it work as intended, WITHOUT adding data to the button element (no dataset or other attributes), AND tell me why it didn't work before AND how/why your fix fixes it.
+ 
+
+Bonus questions:
+
+B1: I'm writing a program to manage recipes.  Give me an example object(s) to manage my data.  What are some operations/actions I'd want to apply to this data to fulfill my goal of a recipe program/site.
+
+B2: RESTful is not REST, but takes a few concepts from REST.  Describe two.
+
+B3: Give at least 2 reasons I might want to use a transpiler.   Give me at least one reason I might _not_ want to use a transpiler.
+
+B4: I have a function that isn't working as intended and to figure out the problem I need to consider the values of many variables at several points in the code.  What is the best way for me to do this, and why
+
+B5: "JSON is not Javascript" - explain this statement and at least two big reasons why it matters?

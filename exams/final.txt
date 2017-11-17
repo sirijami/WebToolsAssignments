@@ -1,0 +1,164 @@
+Info 6250 Summer 2017 Final Exam
+
+Exam Instructions:
+
+    Please give the best relevant answer for each question.  
+    Be sure to read each question completely and provide DETAILED and complete answers.  ("when you want to do X" is not detailed.  When would I want to do X?)
+
+    If you do not know an answer, say what you do know on the topic and you may get partial credit.
+    You are welcome and *encouraged* to use the web for research, but please provide your own answers.
+
+    There are no intended syntax errors or logical errors that are not called out in the code samples.  If you find one, please ask to confirm what should be there.
+
+    Unless the question says otherwise, you can assume every function is called with necessary fields - don't lose exam time writing any code to confirm your input.
+
+The next few questions concern this example code (don't change the example code):
+```
+const potter = new Book({ title: 'Harry Potter and the Impossible Exam', author: new Name({ first: 'J.K.', last: 'Rowling' }) });
+const niven = new Book({ title: "The Mote in God's Eye", author: new Name({ first: 'Larry', last: 'Niven' }) });
+const weird = new Book({ title: 'Voynich Manuscript' });
+
+const library = new Library( potter, niven ); // accepts ANY number of books
+library.addBook(weird);
+
+library.lend({ title: 'Harry Potter and the Impossible Exam', to: new Name({ first: 'Doctor', last: 'Strange' }) });
+
+const authoredBooks = library.searchCollection({ hasAuthor: true }); // An array of Book objects, but does not include the Voynich Manuscript because it has no author
+
+const whereIsPotter = library.location({ title: 'Harry Potter and the Impossible Exam' }); // returns the appropriate Name object
+console.log( whereIsPotter ); // outputs 'Strange, Doctor' 
+
+const whereIsVoynich = library.location({ title: 'Voynich Manuscript' });
+console.log( whereIsVoynich ); // outputs 'Here'
+
+library.unlend({ title: potter.title });
+const whereIsPotterNow = library.location({ title: 'Harry Potter and the Impossible Exam' });
+console.log( whereIsPotterNow ); // outputs 'Here'
+```
+
+Q1: Create a constructor function to create a Name object that would work in the above code
+*This question is about Name only, not Library*
+*Use a constructor function to create inheritance, not ES6 classes*
+
+Q2: Now show me _here_ (not in your answer to Q1) how you would add methods "byFirst()" and "byLast()" to the Name object in Q1 to show different forms of the names (e.g. "Doctor Strange" vs "Strange, Doctor") 
+Please give all the code, including any that is unchanged from Q1.
+
+
+Q3: The Library class can take an _arbitrary_ number of books in the constructor (including zero).  Ignoring any other methods Library needs, worrying about the constructor only, show me an implementation of the Library class using any method you prefer that would match the usage in the example code.
+*Remember - I'm only worried about the constructor function, not all of Library *
+
+-- The next few questions extend on the code sample above --
+
+Imagine the Library class has been fully implemented.  Multiple methods shown above involve finding a book by an implied wide range of options (title, author, etc) as part of their functions. 
+Assume searchCollection(...) exists and is very flexible.  It takes in any parameters involved in finding books (such as title, author, etc) and returns an array of matching Book objects (possibly an empty array);
+Example:   const books = library.searchCollection({ title: "Harry Potter and the Impossible Exam" });
+Example:   const books = library.searchCollection({ hasAuthor: true });
+
+Q4: Show me an implementation of location() that can match the usage in the code sample.  
+Assume all the parameters passed to location() can be passed to searchCollection().  
+Assume the Book object has a 'location' property that is either null or a Name object
+If searchCollection() returns more than 1 book, location() will return 'Multiple Matches'.  
+If searchCollection returns 0 books, location() will return 'No matching book'.
+*The location method must be able to handle the earlier uses*
+*searchCollection(...) would be called as `this.searchCollection(...)` from inside your method*
+
+
+Q5: Show me an implementation of both lend() and unlend() that also make use of searchCollection().  Assume all the params passed to them can be safely passed to searchCollection(), though lend() will also use the 'to' parameter that is passed (searchCollection will ignore the 'to' parameter if passed it)
+Assume the 'to' param is a Name object
+For both lend() and unlend(), if searchCollection(...) returns multiple books, they are all processed
+For both lend() and unlend(), if searchCollection(...) returns 0 books, these methods do nothing.
+*These methods must be able to handle the earlier uses*
+*The assumptions above also apply here*
+
+
+Note: End of questions about the example Library code
+
+Q6:  Given the HTML fragment below on the page http://site.example.com/cats/index.html, answer the questions at the end of the fragment:
+
+<link rel="stylesheet" href="/cats-styling.css"/>
+<img src="no-dogs.png"/>
+<script src="js/cats.js"></script>
+Cats are cool!
+<form action="breeds.php">
+  What is your favorite breed?
+  <select name="breed">
+    <option>Siamese</option>
+    <option>Manx</option>
+    <option>Persian</option>
+    <option>Anything with Fur</option>
+  </select>
+  <button type="submit">I choose you!</button>
+</form>
+<script src="http://other.example.com/purrfect.js"/>
+
+Q6-A: List all the urls (show me fully qualified URLs) that are requested AFTER the page is requested and WHILE the page is loading ( don't list the url of the page itself )
+
+
+Q6-B: What url is requested, and WITH WHICH HTTP VERB, when the user presses the "I choose you!" button if they didn't change anything else?  (Did you remember to answer all parts of the question?)
+
+
+Q6-C: Other than the urls and the code itself, what is the major practical difference between the code loaded by the cats.js script tag vs the code loaded by the purrfect.js script tag? 
+*The answer should not talk about urls, but about what happens on this page*
+
+
+Q7: Write a fetch() call that does the following:
+* sends via POST the JSON object representing { secret: 'myvoiceismypassport', numbers: [ 4, 8, 15, 16, 23, 42 ] } WITHOUT USING JSON.stringify() in your answer. (write the JSON explicitly)
+* sends this request to 'http://example.com/unexpected' (using POST)
+* expects a JSON response and calls console.log() with the parsed JSON object.
+* if the server gives a 403 error, it will console.warn('Authorization problem') and will not process the response
+* any other error from the server will console.warn() response.statusText and will not process the response
+You do not have to worry about network or permission issues (the fetch() itself will always resolve() )
+You do not have to worry about additional headers such as Content-Type for this question.
+HINT: You can use JSON.parse() in your console to confirm your JSON is correct.
+
+
+Q8: Answer with a sentence or two, why is it better to have web services that return data instead of returning HTML built from data? 
+
+
+Q9: If the server running my company's website ( http://awesome.example.com/ ) makes some calls to some internal financial data via a webservice.  This webservice is on a server that prevents anyone outside our company network from accessing it.
+
+Q9-A: Why does the website have errors when I'm at home, even though it works fine when I pull it up at work, and the server that serves the website _is_ inside the company network, even if I'm at home?
+
+
+Q9-B: If the website is serving dynamic pages that are generated by the webserver calling the webservices, but pages sent to the user contain only HTML and CSS, would we have the same problem?  Why / Why Not?
+*Be sure to say why/why not about using from home and work*
+
+
+Q9-C: Assuming the financial data webservices mentioned above are at http://awesome.example.com/money/ and I'm using the website that includes JS from my office computer, does SOP impact things or not?  Why / Why Not?  
+
+
+Q10: Write the code to add a polyfill to add the pretend method "digitize" to work on all arrays.  This method will add up all the numbers in the array (using Number() to convert all values and treating NaN as 0 ), then if the total is 2 or more digits (that is, 10 or more), add the digits of THAT number together, and repeat until you have a 1 digit number (0-9), and return that.
+You do not need to worry about negative numbers or decimal values.
+
+// With your code added, all of the below should work.  Try it in your browser console!
+[1].digitize(); // returns 1
+['dog'].digitize(); // returns 0
+[1,2,3].digitize(); // returns 6 (1+2+3)
+[6,7,8,9].digitize(); // returns 3 (6+7+8+9 = 30, 3+0 = 3)
+[100, 'word', 102, 145].digitize(); // returns 5 (100+102+145=347, 3+4+7= 14, 1+4=5)
+
+
+B1: The polyfill for Q10 is for a method that is not part of the JS specification.  Why is it a bad idea to do what we did there for methods/properties/objects not in the JS specification?
+
+
+B2-3: Answer the questions about these functions:
+
+const f1 = () => {
+  let pA = Promise.resolve('cat');
+  let pB = pA.then( ( cool ) => cool ) 
+  return pB.then( (notdog) => console.log(notdog) );
+};
+
+const f2 = () => {
+  return Promise.resolve('cat')
+  .then( (warm) => warm )
+  .then( (ankle) => ankle )
+  .then( (thing) => console.log(thing) );
+};
+
+B2: These two functions are effectively identical.  Walk me through the steps to explain why.
+
+
+B3: What is the return value of f1? (Be as detailed as you can)
+
+
